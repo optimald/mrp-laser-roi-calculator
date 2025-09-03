@@ -82,10 +82,10 @@ const InputPanel: React.FC<InputPanelProps> = ({ inputs, onInputChange, onDevice
     );
   };
 
-  const SectionHeader: React.FC<{ title: string; section: string }> = ({ title, section }) => (
+  const SectionHeader: React.FC<{ title: string; section: string; bgColor: string; hoverColor: string }> = ({ title, section, bgColor, hoverColor }) => (
     <button
       onClick={() => toggleSection(section)}
-      className="w-full flex items-center justify-between p-3 bg-dark-800 hover:bg-dark-700 border-b border-dark-700 transition-colors"
+      className={`w-full flex items-center justify-between p-3 ${bgColor} ${hoverColor} border-b border-dark-700 transition-colors`}
     >
       <h3 className="font-semibold text-dark-100">{title}</h3>
       {expandedSections.has(section) ? (
@@ -103,7 +103,7 @@ const InputPanel: React.FC<InputPanelProps> = ({ inputs, onInputChange, onDevice
         
         {/* Device & Acquisition */}
         <div className="mb-4">
-          <SectionHeader title="Device & Acquisition" section="device" />
+          <SectionHeader title="Device & Acquisition" section="device" bgColor="bg-blue-900/30" hoverColor="hover:bg-blue-800/40" />
           {expandedSections.has('device') && (
             <div className="p-4 bg-dark-800">
               <DeviceSelector
@@ -189,7 +189,7 @@ const InputPanel: React.FC<InputPanelProps> = ({ inputs, onInputChange, onDevice
 
         {/* Financing / Lease */}
         <div className="mb-4">
-          <SectionHeader title="Financing / Lease" section="financing" />
+          <SectionHeader title="Financing / Lease" section="financing" bgColor="bg-green-900/30" hoverColor="hover:bg-green-800/40" />
           {expandedSections.has('financing') && (
             <div className="p-4 bg-dark-800">
               <div className="mb-3">
@@ -262,7 +262,7 @@ const InputPanel: React.FC<InputPanelProps> = ({ inputs, onInputChange, onDevice
 
         {/* Utilization & Capacity */}
         <div className="mb-4">
-          <SectionHeader title="Utilization & Capacity" section="utilization" />
+          <SectionHeader title="Utilization & Capacity" section="utilization" bgColor="bg-purple-900/30" hoverColor="hover:bg-purple-800/40" />
           {expandedSections.has('utilization') && (
             <div className="p-4 bg-dark-800">
               <InputField
@@ -300,7 +300,7 @@ const InputPanel: React.FC<InputPanelProps> = ({ inputs, onInputChange, onDevice
 
         {/* Pricing & Revenue */}
         <div className="mb-4">
-          <SectionHeader title="Pricing & Revenue" section="pricing" />
+          <SectionHeader title="Pricing & Revenue" section="pricing" bgColor="bg-orange-900/30" hoverColor="hover:bg-orange-800/40" />
           {expandedSections.has('pricing') && (
             <div className="p-4 bg-dark-800">
               <InputField
@@ -351,7 +351,7 @@ const InputPanel: React.FC<InputPanelProps> = ({ inputs, onInputChange, onDevice
 
         {/* Variable Costs */}
         <div className="mb-4">
-          <SectionHeader title="Variable Costs (per treatment)" section="variableCosts" />
+          <SectionHeader title="Variable Costs (per treatment)" section="variableCosts" bgColor="bg-red-900/30" hoverColor="hover:bg-red-800/40" />
           {expandedSections.has('variableCosts') && (
             <div className="p-4 bg-dark-800">
               <InputField
@@ -400,7 +400,7 @@ const InputPanel: React.FC<InputPanelProps> = ({ inputs, onInputChange, onDevice
 
         {/* Fixed Opex */}
         <div className="mb-4">
-          <SectionHeader title="Fixed Opex (monthly)" section="fixedOpex" />
+          <SectionHeader title="Fixed Opex (monthly)" section="fixedOpex" bgColor="bg-teal-900/30" hoverColor="hover:bg-teal-800/40" />
           {expandedSections.has('fixedOpex') && (
             <div className="p-4 bg-dark-800">
               <InputField
