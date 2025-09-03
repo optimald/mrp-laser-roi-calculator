@@ -1,0 +1,51 @@
+/* Custom styles for the MRP Calculator */
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #475569 #1e293b;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+.input-field {
+  @apply w-full px-3 py-2 bg-dark-800 border border-dark-600 rounded-md text-dark-50 placeholder-dark-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+}
+
+.input-field:disabled {
+  @apply bg-dark-700 text-dark-400 cursor-not-allowed;
+}
+
+.btn-primary {
+  @apply px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-dark-900;
+}
+
+.btn-secondary {
+  @apply px-4 py-2 bg-dark-700 hover:bg-dark-600 text-dark-50 border border-dark-600 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-dark-500 focus:ring-offset-2 focus:ring-offset-dark-900;
+}
+
+.card {
+  @apply bg-dark-800 border border-dark-700 rounded-lg p-4;
+}
+
+.kpi-card {
+  @apply bg-gradient-to-br from-dark-800 to-dark-900 border border-dark-700 rounded-lg p-4 hover:border-dark-600 transition-colors duration-200;
+}
+
+.chart-container {
+  @apply bg-dark-800 border border-dark-700 rounded-lg p-4;
+}

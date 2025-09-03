@@ -1,0 +1,46 @@
+[
+  {
+    "id": "cutera-xeo-2018",
+    "model_name": "Cutera XEO 2018",
+    "manufacturer": "Cutera",
+    "msrp": 125000,
+    "condition": "used",
+    "warranty_years": 1,
+    "typical_treatment_time": 30,
+    "consumables_per_treatment": 15,
+    "description": "Multi-application aesthetic laser platform with multiple handpieces for various treatments"
+  },
+  {
+    "id": "solta-fraxel-dual-2011",
+    "model_name": "Solta Fraxel Dual 2011",
+    "manufacturer": "Solta Medical",
+    "msrp": 39950,
+    "condition": "used",
+    "warranty_years": 1,
+    "typical_treatment_time": 45,
+    "consumables_per_treatment": 25,
+    "description": "Fractional laser resurfacing system for skin rejuvenation and scar treatment"
+  },
+  {
+    "id": "lumenis-m22-2020",
+    "model_name": "Lumenis M22 2020",
+    "manufacturer": "Lumenis",
+    "msrp": 150000,
+    "condition": "used",
+    "warranty_years": 2,
+    "typical_treatment_time": 30,
+    "consumables_per_treatment": 22,
+    "description": "Multi-application platform with IPL, laser, and RF technologies"
+  },
+  {
+    "id": "candela-gentlelase-pro-2019",
+    "model_name": "Candela GentleLASE Pro 2019",
+    "manufacturer": "Candela",
+    "msrp": 85000,
+    "condition": "used",
+    "warranty_years": 2,
+    "typical_treatment_time": 15,
+    "consumables_per_treatment": 12,
+    "description": "Alexandrite laser for hair removal and vascular treatments"
+  }
+]

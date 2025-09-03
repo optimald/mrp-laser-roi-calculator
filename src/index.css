@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #0f172a !important;
+  color: #f1f5f9 !important;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Fallback dark theme styles */
+html {
+  background-color: #0f172a !important;
+}
+
+#root {
+  background-color: #0f172a !important;
+  min-height: 100vh;
+}
