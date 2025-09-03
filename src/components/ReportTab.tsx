@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { FileText, Download, Mail, Settings, Eye, ClipboardList, BarChart3, Target, Microscope, DollarSign, TrendingUp, FileText as FileTextIcon, Globe, AlertTriangle, ChevronDown, X, Check, Minimize2, Maximize2 } from 'lucide-react';
 import type { CalculatorInputs, MonthlyResults, KPIs } from '../utils/calculations';
 import { generateTemplateReport, emailTemplateReport, reportSections } from '../utils/reportGenerator';
+import mrpLogo from '../assets/images/mrp-logo.png';
 
 interface ReportTabProps {
   inputs: CalculatorInputs;
@@ -755,7 +756,7 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
                         <div className="bg-dark-600 rounded p-3 flex items-center justify-between">
                           <div className="flex items-center gap-3">
                             <img 
-                              src="/mrp-logo.png" 
+                              src={mrpLogo} 
                               alt="MRP Logo" 
                               className="h-8 w-auto"
                             />
