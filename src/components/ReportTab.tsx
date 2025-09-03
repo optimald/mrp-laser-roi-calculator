@@ -283,24 +283,8 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
             <p className="text-dark-400 mt-1">Create professional reports to replace PandaDoc</p>
           </div>
           
-          <div className="flex items-center space-x-6">
-            {/* Navigation Tabs */}
-            <div className="flex items-center space-x-1 bg-dark-700 rounded-lg p-1">
-              <button
-                onClick={() => window.location.href = '/'}
-                className="px-4 py-2 rounded-md text-sm font-medium transition-colors text-dark-300 hover:text-dark-100 hover:bg-dark-600"
-              >
-                Calculator
-              </button>
-              <button
-                className="px-4 py-2 rounded-md text-sm font-medium transition-colors bg-blue-600 text-white"
-              >
-                Reports
-              </button>
-            </div>
-            
-            <div className="flex items-center gap-3">
-            {/* Scenario Mega Dropdown */}
+          <div className="flex items-center gap-3">
+              {/* Scenario Mega Dropdown */}
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setShowScenarioDropdown(!showScenarioDropdown)}
