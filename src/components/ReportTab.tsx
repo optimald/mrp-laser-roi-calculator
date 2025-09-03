@@ -120,6 +120,22 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
     return selectedTemplate.id === 'custom' ? customSections : selectedTemplate.sections;
   };
 
+  const getSectionIcon = (sectionId: string) => {
+    const icons: Record<string, React.ReactNode> = {
+      'header': <ClipboardList className="h-4 w-4" />,
+      'executive-summary': <BarChart3 className="h-4 w-4" />,
+      'key-metrics': <Target className="h-4 w-4" />,
+      'device-info': <Microscope className="h-4 w-4" />,
+      'financing': <DollarSign className="h-4 w-4" />,
+      'monthly-breakdown': <TrendingUp className="h-4 w-4" />,
+      'assumptions': <FileTextIcon className="h-4 w-4" />,
+      'market-opportunity': <Globe className="h-4 w-4" />,
+      'financial-projections': <BarChart3 className="h-4 w-4" />,
+      'risk-analysis': <AlertTriangle className="h-4 w-4" />
+    };
+    return icons[sectionId] || <FileText className="h-4 w-4" />;
+  };
+
   // Generate preview data
   const previewData = useMemo(() => {
     const sections = getActiveSections();
@@ -141,23 +157,7 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
       hasData,
       totalSections: sections.length
     };
-  }, [selectedTemplate, customSections, kpis, results, getSectionIcon]);
-
-  const getSectionIcon = (sectionId: string) => {
-    const icons: Record<string, React.ReactNode> = {
-      'header': <ClipboardList className="h-4 w-4" />,
-      'executive-summary': <BarChart3 className="h-4 w-4" />,
-      'key-metrics': <Target className="h-4 w-4" />,
-      'device-info': <Microscope className="h-4 w-4" />,
-      'financing': <DollarSign className="h-4 w-4" />,
-      'monthly-breakdown': <TrendingUp className="h-4 w-4" />,
-      'assumptions': <FileTextIcon className="h-4 w-4" />,
-      'market-opportunity': <Globe className="h-4 w-4" />,
-      'financial-projections': <BarChart3 className="h-4 w-4" />,
-      'risk-analysis': <AlertTriangle className="h-4 w-4" />
-    };
-    return icons[sectionId] || <FileText className="h-4 w-4" />;
-  };
+  }, [selectedTemplate, customSections, kpis, results]);
 
   return (
     <div className="p-6 space-y-6">
