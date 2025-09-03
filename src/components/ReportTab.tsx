@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { FileText, Download, Mail, Settings, Eye, ClipboardList, BarChart3, Target, Microscope, DollarSign, TrendingUp, FileText as FileTextIcon, Globe, AlertTriangle, ChevronDown, X, Check, Minimize2, Maximize2 } from 'lucide-react';
 import type { CalculatorInputs, MonthlyResults, KPIs } from '../utils/calculations';
-import { generateTemplateReport, emailTemplateReport } from '../utils/reportGenerator';
+import { generateTemplateReport, emailTemplateReport, reportSections } from '../utils/reportGenerator';
 
 interface ReportTabProps {
   inputs: CalculatorInputs;
@@ -11,7 +11,9 @@ interface ReportTabProps {
     image_url?: string; 
     model_name?: string; 
     manufacturer?: string; 
-    mrp_url?: string; 
+    mrp_url?: string;
+    msrp?: number;
+    description?: string;
   } | null;
 }
 
@@ -72,7 +74,7 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
   const [selectedScenario, setSelectedScenario] = useState<string>('scenario-a');
   const [showScenarioDropdown, setShowScenarioDropdown] = useState(false);
   const [showEmailModal, setShowEmailModal] = useState(false);
-  const [showSidebar, setShowSidebar] = useState(true);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [emailData, setEmailData] = useState({
     to: '',
     subject: 'MRP Aesthetics Laser ROI Analysis',
@@ -239,6 +241,11 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
     return icons[sectionId] || <FileText className="h-4 w-4" />;
   };
 
+  // Get current scenario
+  const currentScenario = useMemo(() => {
+    return scenarios.find(s => s.id === selectedScenario);
+  }, [scenarios, selectedScenario]);
+
   // Generate preview data
   const previewData = useMemo(() => {
     const sections = getActiveSections();
@@ -361,33 +368,25 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
       </div>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Show Sidebar Button (when collapsed) */}
-        {!showSidebar && (
-          <button
-            onClick={() => setShowSidebar(true)}
-            className="fixed left-4 top-24 z-40 bg-dark-800 hover:bg-dark-700 border border-dark-600 rounded-lg p-2 text-dark-300 hover:text-dark-100 transition-colors"
-            title="Show sidebar"
-          >
-            <Maximize2 className="h-4 w-4" />
-          </button>
-        )}
-
         {/* Sidebar */}
-        {showSidebar && (
-          <div className="w-80 bg-dark-800 border-r border-dark-600 overflow-y-auto">
-            {/* Sidebar Header */}
-            <div className="p-4 border-b border-dark-600">
-              <div className="flex items-center justify-between">
+        <div className={`${sidebarCollapsed ? 'w-16' : 'w-80'} bg-dark-800 border-r border-dark-600 overflow-y-auto transition-all duration-300`}>
+          {/* Sidebar Header */}
+          <div className="p-4 border-b border-dark-600">
+            <div className="flex items-center justify-between">
+              {!sidebarCollapsed && (
                 <h3 className="text-lg font-semibold text-dark-100">Report Settings</h3>
-                <button
-                  onClick={() => setShowSidebar(false)}
-                  className="text-dark-400 hover:text-dark-200 transition-colors"
-                  title="Minimize sidebar"
-                >
-                  <Minimize2 className="h-4 w-4" />
-                </button>
-              </div>
+              )}
+              <button
+                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                className="text-dark-400 hover:text-dark-200 transition-colors"
+                title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              >
+                {sidebarCollapsed ? <Maximize2 className="h-4 w-4" /> : <Minimize2 className="h-4 w-4" />}
+              </button>
             </div>
+          </div>
+          
+          {!sidebarCollapsed ? (
             <div className="p-4 space-y-6">
               {/* Customer Information */}
               <div>
@@ -483,8 +482,23 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
                 </div>
               )}
             </div>
-          </div>
-        )}
+          ) : (
+            <div className="p-2 space-y-4">
+              {/* Collapsed sidebar - just icons */}
+              <div className="flex flex-col items-center space-y-3">
+                <div className="p-2 bg-dark-700 rounded" title="Customer Information">
+                  <ClipboardList className="h-4 w-4 text-dark-300" />
+                </div>
+                <div className="p-2 bg-dark-700 rounded" title="Report Templates">
+                  <FileText className="h-4 w-4 text-dark-300" />
+                </div>
+                <div className="p-2 bg-dark-700 rounded" title="Report Sections">
+                  <Settings className="h-4 w-4 text-dark-300" />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Main Preview Area */}
         <div className="flex-1 flex flex-col overflow-hidden">
@@ -550,32 +564,119 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
                     </div>
                   </div>
                   
-                  {/* Dummy Report Content Preview */}
+                  {/* Sample Content Preview */}
                   <div className="bg-dark-900 rounded-md p-4 border border-dark-600">
                     <div className="text-sm text-dark-400 mb-3">Sample Content Preview:</div>
-                    <div className="bg-dark-700 rounded-md p-4 text-sm space-y-3">
-                      <div className="text-dark-200">
-                        <strong>Practice:</strong> {previewData.dummyContent.practiceName}
-                      </div>
-                      <div className="text-dark-200">
-                        <strong>Device:</strong> {previewData.dummyContent.deviceName}
-                      </div>
-                      <div className="text-dark-200">
-                        <strong>Financing:</strong> {previewData.dummyContent.financing}
-                      </div>
-                      <div className="grid grid-cols-2 gap-4 mt-4">
-                        <div>
-                          <div className="text-green-400">Monthly Revenue: ${(previewData.dummyContent.monthlyRevenue / 1000).toFixed(0)}k</div>
-                          <div className="text-green-400">Monthly EBITDA: ${(previewData.dummyContent.monthlyEBITDA / 1000).toFixed(0)}k</div>
-                        </div>
-                        <div>
-                          <div className="text-blue-400">Payback Period: {previewData.dummyContent.paybackMonths} months</div>
-                          <div className="text-purple-400">NPV: ${(previewData.dummyContent.npv / 1000000).toFixed(1)}M</div>
-                        </div>
-                      </div>
-                      <div className="pt-3 border-t border-dark-600 text-yellow-200">
-                        <strong>Disclaimer:</strong> {reportDisclaimers[selectedTemplate.id] || reportDisclaimers['custom']}
-                      </div>
+                    <div className="bg-dark-700 rounded-md p-4 text-sm space-y-4 max-h-96 overflow-y-auto">
+                      {customSections.map((sectionId) => {
+                        const section = reportSections[sectionId];
+                        if (!section) return null;
+                        
+                        return (
+                          <div key={sectionId} className="border-b border-dark-600 pb-3 last:border-b-0">
+                            <div className="flex items-center gap-2 mb-2">
+                              {getSectionIcon(sectionId)}
+                              <span className="font-semibold text-dark-100">{section.name}</span>
+                            </div>
+                            
+                            {/* Section-specific mock content */}
+                            {sectionId === 'header' && (
+                              <div className="space-y-1 text-dark-300">
+                                <div><strong>Practice:</strong> {customerInfo.businessName || 'Aesthetic Laser Center'}</div>
+                                <div><strong>Client:</strong> {customerInfo.name || 'Dr. Sarah Johnson'}</div>
+                                <div><strong>Email:</strong> {customerInfo.email || 'sarah@aestheticcenter.com'}</div>
+                                <div><strong>Report Date:</strong> {new Date().toLocaleDateString()}</div>
+                                {currentScenario && (
+                                  <>
+                                    <div><strong>Scenario:</strong> {currentScenario.name}</div>
+                                    <div className="text-xs">{currentScenario.description}</div>
+                                  </>
+                                )}
+                              </div>
+                            )}
+                            
+                            {sectionId === 'executive-summary' && (
+                              <div className="space-y-2 text-dark-300">
+                                <div className="text-xs">This analysis evaluates the financial viability of acquiring the {selectedDevice?.model_name || 'selected laser device'} for your practice.</div>
+                                <div className="grid grid-cols-2 gap-2 text-xs">
+                                  <div><strong>Device:</strong> {selectedDevice?.model_name || 'Laser Device'}</div>
+                                  <div><strong>Financing:</strong> {previewData.dummyContent.financing}</div>
+                                  <div><strong>Monthly Revenue:</strong> ${(previewData.dummyContent.monthlyRevenue / 1000).toFixed(0)}k</div>
+                                  <div><strong>Payback Period:</strong> {previewData.dummyContent.paybackMonths} months</div>
+                                </div>
+                              </div>
+                            )}
+                            
+                            {sectionId === 'key-metrics' && (
+                              <div className="grid grid-cols-2 gap-2 text-dark-300">
+                                <div><strong>Monthly Revenue:</strong> <span className="text-green-400">${(previewData.dummyContent.monthlyRevenue / 1000).toFixed(0)}k</span></div>
+                                <div><strong>Monthly EBITDA:</strong> <span className="text-green-400">${(previewData.dummyContent.monthlyEBITDA / 1000).toFixed(0)}k</span></div>
+                                <div><strong>Payback Period:</strong> <span className="text-blue-400">{previewData.dummyContent.paybackMonths} months</span></div>
+                                <div><strong>NPV (5 years):</strong> <span className="text-purple-400">${(previewData.dummyContent.npv / 1000000).toFixed(1)}M</span></div>
+                                <div><strong>IRR:</strong> <span className="text-yellow-400">45.2%</span></div>
+                                <div><strong>Breakeven Tx/Day:</strong> <span className="text-orange-400">6.7</span></div>
+                              </div>
+                            )}
+                            
+                            {sectionId === 'device-info' && (
+                              <div className="space-y-2 text-dark-300">
+                                <div><strong>Device:</strong> {selectedDevice?.model_name || 'Laser Device'}</div>
+                                <div><strong>MSRP:</strong> ${selectedDevice?.msrp?.toLocaleString() || '150,000'}</div>
+                                <div><strong>Manufacturer:</strong> {selectedDevice?.manufacturer || 'Aesthetic Laser'}</div>
+                                <div className="text-xs"><strong>Description:</strong> {selectedDevice?.description || 'Advanced aesthetic laser system for various treatments'}</div>
+                                {selectedDevice?.image_url && (
+                                  <div className="bg-dark-600 rounded p-2 text-center text-xs text-dark-400">
+                                    📷 Device Image Placeholder
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                            
+                            {sectionId === 'financing' && (
+                              <div className="space-y-1 text-dark-300">
+                                <div><strong>Financing Type:</strong> {previewData.dummyContent.financing}</div>
+                                <div><strong>Down Payment:</strong> $15,000 (10%)</div>
+                                <div><strong>Monthly Payment:</strong> $2,847</div>
+                                <div><strong>Interest Rate:</strong> 6.5% APR</div>
+                                <div><strong>Term:</strong> 60 months</div>
+                              </div>
+                            )}
+                            
+                            {sectionId === 'monthly-breakdown' && (
+                              <div className="space-y-1 text-dark-300">
+                                <div className="grid grid-cols-2 gap-2 text-xs">
+                                  <div><strong>Revenue:</strong> <span className="text-green-400">$154,815</span></div>
+                                  <div><strong>COGS:</strong> <span className="text-red-400">$15,482</span></div>
+                                  <div><strong>Labor:</strong> <span className="text-red-400">$12,000</span></div>
+                                  <div><strong>Rent:</strong> <span className="text-red-400">$8,000</span></div>
+                                  <div><strong>Marketing:</strong> <span className="text-red-400">$5,000</span></div>
+                                  <div><strong>Other OpEx:</strong> <span className="text-red-400">$3,000</span></div>
+                                </div>
+                                <div className="pt-1 border-t border-dark-600">
+                                  <strong>Net Income:</strong> <span className="text-green-400">$111,333</span>
+                                </div>
+                              </div>
+                            )}
+                            
+                            {sectionId === 'assumptions' && (
+                              <div className="space-y-1 text-dark-300 text-xs">
+                                <div><strong>Treatments per Day:</strong> 8-12 (ramp-up over 6 months)</div>
+                                <div><strong>No-Show Rate:</strong> 15%</div>
+                                <div><strong>Package Discount:</strong> 20%</div>
+                                <div><strong>Membership Rate:</strong> 30% of patients</div>
+                                <div><strong>Upsell Rate:</strong> 25% of treatments</div>
+                                <div><strong>Depreciation:</strong> 5-year straight line</div>
+                              </div>
+                            )}
+                            
+                            {sectionId === 'disclaimer' && (
+                              <div className="text-xs text-yellow-200 bg-yellow-900/20 p-2 rounded">
+                                <strong>Legal Disclaimer:</strong> {reportDisclaimers[selectedTemplate.id] || reportDisclaimers['custom']}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
