@@ -475,6 +475,48 @@ export const reportSections: Record<string, ReportSection> = {
       
       return yPosition + 10;
     }
+  },
+
+  'prepared-by': {
+    id: 'prepared-by',
+    name: 'Prepared by MRP',
+    content: (pdf, _inputs, _results, _kpis, _selectedDevice, yPosition) => {
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      
+      // Add a line separator
+      yPosition = addLine(pdf, yPosition, pageWidth);
+      yPosition += 10;
+      
+      // Add "Prepared by" header
+      pdf.setFontSize(12);
+      pdf.setTextColor(0, 0, 0);
+      yPosition = addText(pdf, 'Prepared by', 20, yPosition, pageWidth - 40, 12);
+      yPosition += 5;
+      
+      // Add MRP branding box
+      pdf.setFillColor(240, 240, 240);
+      pdf.rect(20, yPosition, pageWidth - 40, 25, 'F');
+      
+      // Add MRP logo placeholder (in real implementation, you'd load the actual logo)
+      pdf.setFillColor(15, 23, 42);
+      pdf.rect(25, yPosition + 5, 15, 15, 'F');
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFontSize(8);
+      pdf.text('MRP', 30, yPosition + 14);
+      
+      // Add MRP text
+      pdf.setTextColor(0, 0, 0);
+      pdf.setFontSize(12);
+      pdf.text('Powered by MRP', 45, yPosition + 10);
+      pdf.setFontSize(10);
+      pdf.text('Medical Revenue Partners', 45, yPosition + 16);
+      
+      // Add website link
+      pdf.setTextColor(59, 130, 246);
+      pdf.text('Visit mrp.io', pageWidth - 80, yPosition + 13);
+      
+      return yPosition + 35;
+    }
   }
 };
 
@@ -505,6 +547,18 @@ export const generateTemplateReport = async (
       
       yPosition = section.content(pdf, inputs, results, kpis, selectedDevice, yPosition, customerInfo, scenario);
     }
+  }
+  
+  // Always add the "Prepared by MRP" section at the end
+  const preparedBySection = reportSections['prepared-by'];
+  if (preparedBySection) {
+    // Check if we need a new page
+    if (yPosition > pageHeight - 50) {
+      pdf.addPage();
+      yPosition = 20;
+    }
+    
+    yPosition = preparedBySection.content(pdf, inputs, results, kpis, selectedDevice, yPosition, customerInfo, scenario);
   }
   
   // Save the PDF
