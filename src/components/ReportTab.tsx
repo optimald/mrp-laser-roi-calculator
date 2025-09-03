@@ -15,6 +15,20 @@ interface ReportTabProps {
   } | null;
 }
 
+interface Scenario {
+  id: string;
+  name: string;
+  description: string;
+  device: string;
+  financing: string;
+  keyMetrics: {
+    monthlyRevenue: number;
+    monthlyEBITDA: number;
+    paybackMonths: number;
+    npv: number;
+  };
+}
+
 interface ReportTemplate {
   id: string;
   name: string;
@@ -55,11 +69,63 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
   const [selectedTemplate, setSelectedTemplate] = useState<ReportTemplate>(defaultTemplates[0]);
   const [customSections, setCustomSections] = useState<string[]>(['header']);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [selectedScenario, setSelectedScenario] = useState<string>('scenario-a');
   const [emailData, setEmailData] = useState({
     to: '',
     subject: 'MRP Aesthetics Laser ROI Analysis',
     message: 'Please find attached the ROI analysis report for your review.'
   });
+
+  // Sample scenarios data
+  const scenarios: Scenario[] = [
+    {
+      id: 'scenario-a',
+      name: 'Scenario A - Conservative',
+      description: 'Conservative estimates with moderate growth',
+      device: selectedDevice ? `${selectedDevice.manufacturer} ${selectedDevice.model_name}` : 'Cutera XEO 2018',
+      financing: '30% Down, 5.5% APR, 84 months',
+      keyMetrics: {
+        monthlyRevenue: 85000,
+        monthlyEBITDA: 48000,
+        paybackMonths: 5.2,
+        npv: 1250000
+      }
+    },
+    {
+      id: 'scenario-b',
+      name: 'Scenario B - Optimistic',
+      description: 'Optimistic projections with high growth',
+      device: selectedDevice ? `${selectedDevice.manufacturer} ${selectedDevice.model_name}` : 'Lumenis M22 2020',
+      financing: '20% Down, 6.5% APR, 60 months',
+      keyMetrics: {
+        monthlyRevenue: 120000,
+        monthlyEBITDA: 75000,
+        paybackMonths: 3.8,
+        npv: 2100000
+      }
+    },
+    {
+      id: 'scenario-c',
+      name: 'Scenario C - Aggressive',
+      description: 'Aggressive expansion with premium pricing',
+      device: selectedDevice ? `${selectedDevice.manufacturer} ${selectedDevice.model_name}` : 'Candela GentleLASE Pro 2019',
+      financing: '15% Down, 7.0% APR, 48 months',
+      keyMetrics: {
+        monthlyRevenue: 150000,
+        monthlyEBITDA: 95000,
+        paybackMonths: 2.9,
+        npv: 2800000
+      }
+    }
+  ];
+
+  // Report disclaimers
+  const reportDisclaimers: Record<string, string> = {
+    'executive-summary': 'This executive summary provides high-level financial projections based on current market data and industry benchmarks. Actual results may vary based on market conditions, operational efficiency, and competitive factors.',
+    'detailed-analysis': 'This detailed analysis includes comprehensive financial modeling with multiple scenarios. All projections are based on current market data and should be reviewed by qualified financial professionals before making investment decisions.',
+    'investor-pitch': 'This investor presentation contains forward-looking statements and projections. Past performance does not guarantee future results. Investment decisions should be based on thorough due diligence and professional financial advice.',
+    'custom': 'This custom report combines selected financial metrics and projections. All data should be independently verified and reviewed by qualified professionals before making business decisions.'
+  };
 
   const availableSections = [
     { id: 'header', name: 'Header & Practice Info', icon: <ClipboardList className="h-4 w-4" /> },
@@ -186,6 +252,54 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
         </div>
       </div>
 
+      {/* Scenario Selector */}
+      <div className="bg-dark-800 rounded-lg p-4">
+        <h3 className="text-lg font-semibold text-dark-100 mb-4 flex items-center gap-2">
+          <Settings className="h-5 w-5" />
+          Scenario Selection
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {scenarios.map((scenario) => (
+            <button
+              key={scenario.id}
+              onClick={() => setSelectedScenario(scenario.id)}
+              className={`p-4 rounded-md border transition-colors text-left ${
+                selectedScenario === scenario.id
+                  ? 'border-blue-500 bg-blue-500/10 text-blue-400'
+                  : 'border-dark-600 hover:border-dark-500 text-dark-200'
+              }`}
+            >
+              <div className="font-medium mb-2">{scenario.name}</div>
+              <div className="text-sm text-dark-400 mb-3">{scenario.description}</div>
+              <div className="space-y-1 text-xs">
+                <div><span className="text-dark-400">Device:</span> {scenario.device}</div>
+                <div><span className="text-dark-400">Financing:</span> {scenario.financing}</div>
+                <div className="pt-2 border-t border-dark-600">
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <div className="text-dark-400">Revenue:</div>
+                      <div className="text-green-400 font-medium">${(scenario.keyMetrics.monthlyRevenue / 1000).toFixed(0)}k</div>
+                    </div>
+                    <div>
+                      <div className="text-dark-400">EBITDA:</div>
+                      <div className="text-green-400 font-medium">${(scenario.keyMetrics.monthlyEBITDA / 1000).toFixed(0)}k</div>
+                    </div>
+                    <div>
+                      <div className="text-dark-400">Payback:</div>
+                      <div className="text-blue-400 font-medium">{scenario.keyMetrics.paybackMonths.toFixed(1)}m</div>
+                    </div>
+                    <div>
+                      <div className="text-dark-400">NPV:</div>
+                      <div className="text-purple-400 font-medium">${(scenario.keyMetrics.npv / 1000000).toFixed(1)}M</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Template Selection */}
         <div className="lg:col-span-1">
@@ -309,6 +423,23 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
         </div>
       </div>
 
+      {/* Report Disclaimer */}
+      <div className="bg-yellow-900/20 border border-yellow-600/30 rounded-lg p-4">
+        <h3 className="text-lg font-semibold text-yellow-200 mb-3 flex items-center gap-2">
+          <AlertTriangle className="h-5 w-5" />
+          Report Disclaimer
+        </h3>
+        <div className="text-sm text-yellow-100 leading-relaxed">
+          {reportDisclaimers[selectedTemplate.id] || reportDisclaimers['custom']}
+        </div>
+        <div className="mt-3 pt-3 border-t border-yellow-600/30">
+          <div className="text-xs text-yellow-200">
+            <strong>Selected Scenario:</strong> {scenarios.find(s => s.id === selectedScenario)?.name} - 
+            {scenarios.find(s => s.id === selectedScenario)?.description}
+          </div>
+        </div>
+      </div>
+
       {/* Preview */}
       <div className="bg-dark-800 rounded-lg p-4">
         <h3 className="text-lg font-semibold text-dark-100 mb-4 flex items-center gap-2">
@@ -321,6 +452,13 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
               <div className="font-medium text-dark-100">Report: {selectedTemplate.name}</div>
               <div className="text-sm text-dark-400">
                 {previewData.hasData ? '✅ Data Ready' : '⚠️ No Data'}
+              </div>
+            </div>
+            
+            <div className="pt-2 border-t border-dark-600">
+              <div className="text-sm">
+                <span className="text-dark-400">Scenario:</span>
+                <span className="text-blue-400 ml-2">{scenarios.find(s => s.id === selectedScenario)?.name}</span>
               </div>
             </div>
             
