@@ -568,7 +568,7 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
                   <div className="bg-dark-900 rounded-md p-4 border border-dark-600">
                     <div className="text-sm text-dark-400 mb-3">Sample Content Preview:</div>
                     <div className="bg-dark-700 rounded-md p-4 text-sm space-y-4 max-h-96 overflow-y-auto">
-                      {customSections.map((sectionId) => {
+                      {getActiveSections().map((sectionId) => {
                         const section = reportSections[sectionId];
                         if (!section) return null;
                         
@@ -677,6 +677,19 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
                           </div>
                         );
                       })}
+                      
+                      {/* Always include disclaimer if not already in active sections */}
+                      {!getActiveSections().includes('disclaimer') && (
+                        <div className="border-b border-dark-600 pb-3 last:border-b-0">
+                          <div className="flex items-center gap-2 mb-2">
+                            <AlertTriangle className="h-4 w-4 text-yellow-400" />
+                            <span className="font-semibold text-dark-100">Legal Disclaimer</span>
+                          </div>
+                          <div className="text-xs text-yellow-200 bg-yellow-900/20 p-2 rounded">
+                            <strong>Legal Disclaimer:</strong> {reportDisclaimers[selectedTemplate.id] || reportDisclaimers['custom']}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
