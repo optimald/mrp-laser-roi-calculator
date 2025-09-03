@@ -348,6 +348,133 @@ export const reportSections: Record<string, ReportSection> = {
       
       return yPosition + 10;
     }
+  },
+
+  'charts': {
+    id: 'charts',
+    name: 'Financial Charts',
+    content: (pdf, _inputs, results, _kpis, _selectedDevice, yPosition) => {
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      
+      yPosition = addSectionHeader(pdf, 'Financial Charts', yPosition, pageWidth);
+      
+      // Add placeholder for charts
+      pdf.setFillColor(240, 240, 240);
+      pdf.rect(20, yPosition, pageWidth - 40, 60, 'F');
+      pdf.setTextColor(100, 100, 100);
+      yPosition = addText(pdf, 'Financial Charts Placeholder', 20, yPosition + 30, pageWidth - 40, 12);
+      pdf.setTextColor(0, 0, 0);
+      
+      return yPosition + 40;
+    }
+  },
+
+  'market-opportunity': {
+    id: 'market-opportunity',
+    name: 'Market Opportunity',
+    content: (pdf, _inputs, _results, _kpis, _selectedDevice, yPosition) => {
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      
+      yPosition = addSectionHeader(pdf, 'Market Opportunity', yPosition, pageWidth);
+      
+      const marketContent = [
+        'Market Analysis:',
+        '• Aesthetic laser market is growing at 12% annually',
+        '• Average treatment cost ranges from $200-$800 per session',
+        '• High demand for non-invasive cosmetic procedures',
+        '• Competitive landscape includes established players and new entrants',
+        '',
+        'Target Demographics:',
+        '• Age 25-65 with disposable income',
+        '• Health-conscious individuals seeking aesthetic improvements',
+        '• Both male and female clientele',
+        '',
+        'Growth Opportunities:',
+        '• Package deals and membership programs',
+        '• Upselling additional treatments',
+        '• Seasonal promotions and marketing campaigns'
+      ];
+      
+      marketContent.forEach(line => {
+        yPosition = addText(pdf, line, 20, yPosition, pageWidth - 40, 10);
+      });
+      
+      return yPosition + 10;
+    }
+  },
+
+  'financial-projections': {
+    id: 'financial-projections',
+    name: 'Financial Projections',
+    content: (pdf, _inputs, results, kpis, _selectedDevice, yPosition) => {
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      
+      yPosition = addSectionHeader(pdf, 'Financial Projections', yPosition, pageWidth);
+      
+      if (kpis) {
+        const projections = [
+          '5-Year Financial Projections:',
+          '',
+          `Year 1: Revenue $${(kpis.monthlyRevenue * 12 / 1000).toFixed(0)}k, EBITDA $${(kpis.monthlyEBITDA * 12 / 1000).toFixed(0)}k`,
+          `Year 2: Revenue $${(kpis.monthlyRevenue * 12 * 1.15 / 1000).toFixed(0)}k, EBITDA $${(kpis.monthlyEBITDA * 12 * 1.15 / 1000).toFixed(0)}k`,
+          `Year 3: Revenue $${(kpis.monthlyRevenue * 12 * 1.3 / 1000).toFixed(0)}k, EBITDA $${(kpis.monthlyEBITDA * 12 * 1.3 / 1000).toFixed(0)}k`,
+          `Year 4: Revenue $${(kpis.monthlyRevenue * 12 * 1.45 / 1000).toFixed(0)}k, EBITDA $${(kpis.monthlyEBITDA * 12 * 1.45 / 1000).toFixed(0)}k`,
+          `Year 5: Revenue $${(kpis.monthlyRevenue * 12 * 1.6 / 1000).toFixed(0)}k, EBITDA $${(kpis.monthlyEBITDA * 12 * 1.6 / 1000).toFixed(0)}k`,
+          '',
+          'Growth Assumptions:',
+          '• 15% annual revenue growth',
+          '• Improved operational efficiency',
+          '• Market expansion and new services'
+        ];
+        
+        projections.forEach(line => {
+          yPosition = addText(pdf, line, 20, yPosition, pageWidth - 40, 10);
+        });
+      }
+      
+      return yPosition + 10;
+    }
+  },
+
+  'risk-analysis': {
+    id: 'risk-analysis',
+    name: 'Risk Analysis',
+    content: (pdf, _inputs, _results, _kpis, _selectedDevice, yPosition) => {
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      
+      yPosition = addSectionHeader(pdf, 'Risk Analysis', yPosition, pageWidth);
+      
+      const riskContent = [
+        'Risk Assessment:',
+        '',
+        'Market Risks:',
+        '• Economic downturns affecting discretionary spending',
+        '• Increased competition in aesthetic market',
+        '• Regulatory changes in cosmetic procedures',
+        '',
+        'Operational Risks:',
+        '• Equipment maintenance and downtime',
+        '• Staff turnover and training costs',
+        '• Technology obsolescence',
+        '',
+        'Financial Risks:',
+        '• Interest rate fluctuations on financing',
+        '• Insurance and liability costs',
+        '• Cash flow management during slow periods',
+        '',
+        'Mitigation Strategies:',
+        '• Diversified service offerings',
+        '• Strong customer retention programs',
+        '• Regular equipment maintenance schedules',
+        '• Comprehensive insurance coverage'
+      ];
+      
+      riskContent.forEach(line => {
+        yPosition = addText(pdf, line, 20, yPosition, pageWidth - 40, 10);
+      });
+      
+      return yPosition + 10;
+    }
   }
 };
 

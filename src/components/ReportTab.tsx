@@ -566,7 +566,7 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
                   {/* Sample Content Preview */}
                   <div className="bg-dark-900 rounded-md p-4 border border-dark-600">
                     <div className="text-sm text-dark-400 mb-3">Sample Content Preview:</div>
-                    <div className="bg-dark-700 rounded-md p-4 text-sm space-y-4 max-h-96 overflow-y-auto">
+                    <div className="bg-dark-700 rounded-md p-4 text-sm space-y-4">
                       {getActiveSections().map((sectionId) => {
                         const section = reportSections[sectionId];
                         if (!section) return null;
@@ -665,6 +665,63 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
                                 <div><strong>Membership Rate:</strong> 30% of patients</div>
                                 <div><strong>Upsell Rate:</strong> 25% of treatments</div>
                                 <div><strong>Depreciation:</strong> 5-year straight line</div>
+                              </div>
+                            )}
+                            
+                            {sectionId === 'charts' && (
+                              <div className="space-y-2 text-dark-300">
+                                <div className="bg-dark-600 rounded p-4 text-center text-xs text-dark-400">
+                                  📊 Financial Charts Placeholder
+                                </div>
+                                <div className="text-xs">
+                                  <div>• Monthly Cash Flow Chart</div>
+                                  <div>• Revenue vs Expenses Trend</div>
+                                  <div>• ROI Projection Graph</div>
+                                  <div>• Breakeven Analysis Chart</div>
+                                </div>
+                              </div>
+                            )}
+                            
+                            {sectionId === 'market-opportunity' && (
+                              <div className="space-y-2 text-dark-300 text-xs">
+                                <div><strong>Market Analysis:</strong></div>
+                                <div>• Aesthetic laser market growing at 12% annually</div>
+                                <div>• Average treatment cost: $200-$800 per session</div>
+                                <div>• High demand for non-invasive procedures</div>
+                                <div className="pt-2"><strong>Target Demographics:</strong></div>
+                                <div>• Age 25-65 with disposable income</div>
+                                <div>• Health-conscious individuals</div>
+                                <div>• Both male and female clientele</div>
+                              </div>
+                            )}
+                            
+                            {sectionId === 'financial-projections' && (
+                              <div className="space-y-2 text-dark-300 text-xs">
+                                <div><strong>5-Year Financial Projections:</strong></div>
+                                <div>• Year 1: Revenue $1,020k, EBITDA $576k</div>
+                                <div>• Year 2: Revenue $1,173k, EBITDA $662k</div>
+                                <div>• Year 3: Revenue $1,326k, EBITDA $749k</div>
+                                <div>• Year 4: Revenue $1,479k, EBITDA $835k</div>
+                                <div>• Year 5: Revenue $1,632k, EBITDA $922k</div>
+                                <div className="pt-2"><strong>Growth Assumptions:</strong></div>
+                                <div>• 15% annual revenue growth</div>
+                                <div>• Improved operational efficiency</div>
+                              </div>
+                            )}
+                            
+                            {sectionId === 'risk-analysis' && (
+                              <div className="space-y-2 text-dark-300 text-xs">
+                                <div><strong>Market Risks:</strong></div>
+                                <div>• Economic downturns affecting spending</div>
+                                <div>• Increased competition</div>
+                                <div>• Regulatory changes</div>
+                                <div className="pt-2"><strong>Operational Risks:</strong></div>
+                                <div>• Equipment maintenance and downtime</div>
+                                <div>• Staff turnover and training costs</div>
+                                <div>• Technology obsolescence</div>
+                                <div className="pt-2"><strong>Mitigation Strategies:</strong></div>
+                                <div>• Diversified service offerings</div>
+                                <div>• Strong customer retention programs</div>
                               </div>
                             )}
                             
