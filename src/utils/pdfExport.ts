@@ -76,9 +76,9 @@ export const exportToPDF = async (
 
   // Header
   pdf.setFillColor(15, 23, 42);
-  pdf.rect(0, 0, pageWidth, 25, 'F');
+  pdf.rect(0, 0, pageWidth, 20, 'F');
   pdf.setTextColor(255, 255, 255);
-  yPosition = addText('MRP Aesthetics Laser ROI Calculator', 20, 12, pageWidth - 40, 14);
+  yPosition = addText('MRP Aesthetics Laser ROI Calculator', 20, 10, pageWidth - 40, 12);
   pdf.setTextColor(0, 0, 0);
 
   // Practice Information - Start after header with proper spacing
