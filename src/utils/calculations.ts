@@ -278,7 +278,7 @@ export function calculateMonthlyResults(
     }
   }
   
-  // For loans, subtract monthly payment from cash flow
+  // For loans, subtract monthly payment from cash flow (this is the correct approach)
   if (financing.purchaseMethod === 'loan') {
     cashFlow -= monthlyPayment;
   }
@@ -441,9 +441,9 @@ export const defaultInputs: CalculatorInputs = {
   },
   utilization: {
     openDaysPerMonth: 22,
-    treatmentsPerDay: 12,
-    utilizationRamp: [30, 50, 70, 85, 95, 100],
-    noShowRate: 8,
+    treatmentsPerDay: 15,
+    utilizationRamp: [40, 60, 80, 90, 95, 100],
+    noShowRate: 5,
     avgTreatmentTime: 30,
     seasonality: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
   },
@@ -468,13 +468,13 @@ export const defaultInputs: CalculatorInputs = {
     paymentProcessingFixed: 0.30
   },
   fixedOpex: {
-    marketingBudget: 3000,
-    staffSalaryAllocation: 2000,
-    rentAllocation: 1500,
-    insurance: 300,
-    softwareEMR: 400,
-    maintenancePostWarranty: 500,
-    calibrationService: 200,
-    downtimeReserve: 5
+    marketingBudget: 2000,
+    staffSalaryAllocation: 1500,
+    rentAllocation: 1200,
+    insurance: 200,
+    softwareEMR: 300,
+    maintenancePostWarranty: 300,
+    calibrationService: 150,
+    downtimeReserve: 3
   }
 };
