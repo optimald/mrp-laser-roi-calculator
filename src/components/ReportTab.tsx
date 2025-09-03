@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { FileText, Download, Mail, Settings, Eye, Plus, Trash2 } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { FileText, Download, Mail, Settings, Eye, Plus, Trash2, ClipboardList, BarChart3, Target, Microscope, DollarSign, TrendingUp, FileText as FileTextIcon, Globe, AlertTriangle } from 'lucide-react';
 import type { CalculatorInputs, MonthlyResults, KPIs } from '../utils/calculations';
+import { generateTemplateReport, emailTemplateReport, reportSections } from '../utils/reportGenerator';
 
 interface ReportTabProps {
   inputs: CalculatorInputs;
@@ -61,17 +62,17 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
   });
 
   const availableSections = [
-    { id: 'header', name: 'Header & Practice Info', icon: '📋' },
-    { id: 'executive-summary', name: 'Executive Summary', icon: '📊' },
-    { id: 'key-metrics', name: 'Key Performance Metrics', icon: '🎯' },
-    { id: 'device-info', name: 'Device Information', icon: '🔬' },
-    { id: 'financing', name: 'Financing Details', icon: '💰' },
-    { id: 'monthly-breakdown', name: 'Monthly P&L Breakdown', icon: '📈' },
-    { id: 'charts', name: 'Financial Charts', icon: '📊' },
-    { id: 'assumptions', name: 'Assumptions & Methodology', icon: '📝' },
-    { id: 'market-opportunity', name: 'Market Opportunity', icon: '🌍' },
-    { id: 'financial-projections', name: 'Financial Projections', icon: '📊' },
-    { id: 'risk-analysis', name: 'Risk Analysis', icon: '⚠️' }
+    { id: 'header', name: 'Header & Practice Info', icon: <ClipboardList className="h-4 w-4" /> },
+    { id: 'executive-summary', name: 'Executive Summary', icon: <BarChart3 className="h-4 w-4" /> },
+    { id: 'key-metrics', name: 'Key Performance Metrics', icon: <Target className="h-4 w-4" /> },
+    { id: 'device-info', name: 'Device Information', icon: <Microscope className="h-4 w-4" /> },
+    { id: 'financing', name: 'Financing Details', icon: <DollarSign className="h-4 w-4" /> },
+    { id: 'monthly-breakdown', name: 'Monthly P&L Breakdown', icon: <TrendingUp className="h-4 w-4" /> },
+    { id: 'charts', name: 'Financial Charts', icon: <BarChart3 className="h-4 w-4" /> },
+    { id: 'assumptions', name: 'Assumptions & Methodology', icon: <FileTextIcon className="h-4 w-4" /> },
+    { id: 'market-opportunity', name: 'Market Opportunity', icon: <Globe className="h-4 w-4" /> },
+    { id: 'financial-projections', name: 'Financial Projections', icon: <BarChart3 className="h-4 w-4" /> },
+    { id: 'risk-analysis', name: 'Risk Analysis', icon: <AlertTriangle className="h-4 w-4" /> }
   ];
 
   const handleTemplateSelect = (template: ReportTemplate) => {
@@ -94,7 +95,6 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
   const handleGenerateReport = async () => {
     setIsGenerating(true);
     try {
-      // This will call the enhanced PDF generation with template support
       const sections = selectedTemplate.id === 'custom' ? customSections : selectedTemplate.sections;
       await generateTemplateReport(inputs, results, kpis, selectedDevice, sections, selectedTemplate.name);
     } catch (error) {
@@ -107,7 +107,6 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
   const handleEmailReport = async () => {
     setIsGenerating(true);
     try {
-      // This will generate and email the report
       const sections = selectedTemplate.id === 'custom' ? customSections : selectedTemplate.sections;
       await emailTemplateReport(inputs, results, kpis, selectedDevice, sections, selectedTemplate.name, emailData);
     } catch (error) {
@@ -119,6 +118,45 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
 
   const getActiveSections = () => {
     return selectedTemplate.id === 'custom' ? customSections : selectedTemplate.sections;
+  };
+
+  // Generate preview data
+  const previewData = useMemo(() => {
+    const sections = getActiveSections();
+    const sectionDetails = sections.map(sectionId => {
+      const section = reportSections[sectionId];
+      return section ? {
+        id: section.id,
+        name: section.name,
+        icon: getSectionIcon(sectionId)
+      } : null;
+    }).filter(Boolean);
+
+    const estimatedPages = Math.ceil(sections.length / 2) + 1; // Rough estimate
+    const hasData = kpis && results.length > 0;
+    
+    return {
+      sections: sectionDetails,
+      estimatedPages,
+      hasData,
+      totalSections: sections.length
+    };
+  }, [selectedTemplate, customSections, kpis, results, getSectionIcon]);
+
+  const getSectionIcon = (sectionId: string) => {
+    const icons: Record<string, React.ReactNode> = {
+      'header': <ClipboardList className="h-4 w-4" />,
+      'executive-summary': <BarChart3 className="h-4 w-4" />,
+      'key-metrics': <Target className="h-4 w-4" />,
+      'device-info': <Microscope className="h-4 w-4" />,
+      'financing': <DollarSign className="h-4 w-4" />,
+      'monthly-breakdown': <TrendingUp className="h-4 w-4" />,
+      'assumptions': <FileTextIcon className="h-4 w-4" />,
+      'market-opportunity': <Globe className="h-4 w-4" />,
+      'financial-projections': <BarChart3 className="h-4 w-4" />,
+      'risk-analysis': <AlertTriangle className="h-4 w-4" />
+    };
+    return icons[sectionId] || <FileText className="h-4 w-4" />;
   };
 
   return (
@@ -201,7 +239,7 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
                         onChange={() => handleSectionToggle(section.id)}
                         className="rounded border-dark-600 bg-dark-700 text-blue-500 focus:ring-blue-500"
                       />
-                      <span className="text-lg">{section.icon}</span>
+                      <div className="text-dark-400">{section.icon}</div>
                       <span className="text-dark-200">{section.name}</span>
                     </label>
                   ))}
@@ -215,7 +253,7 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
                     const section = availableSections.find(s => s.id === sectionId);
                     return section ? (
                       <div key={sectionId} className="flex items-center gap-3 p-3 rounded-md bg-dark-700">
-                        <span className="text-lg">{section.icon}</span>
+                        <div className="text-dark-400">{section.icon}</div>
                         <span className="text-dark-200">{section.name}</span>
                       </div>
                     ) : null;
@@ -278,14 +316,62 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
           Report Preview
         </h3>
         <div className="bg-dark-900 rounded-md p-4 border border-dark-600">
-          <div className="text-dark-300 text-sm">
-            <div className="font-medium text-dark-100 mb-2">Report: {selectedTemplate.name}</div>
-            <div className="space-y-1">
-              <div>Sections: {getActiveSections().length}</div>
-              <div>Pages: ~{Math.ceil(getActiveSections().length / 3)}</div>
-              <div>Format: PDF</div>
-              {emailData.to && <div>Email: {emailData.to}</div>}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="font-medium text-dark-100">Report: {selectedTemplate.name}</div>
+              <div className="text-sm text-dark-400">
+                {previewData.hasData ? '✅ Data Ready' : '⚠️ No Data'}
+              </div>
             </div>
+            
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <span className="text-dark-400">Sections:</span>
+                <span className="text-dark-200 ml-2">{previewData.totalSections}</span>
+              </div>
+              <div>
+                <span className="text-dark-400">Pages:</span>
+                <span className="text-dark-200 ml-2">~{previewData.estimatedPages}</span>
+              </div>
+              <div>
+                <span className="text-dark-400">Format:</span>
+                <span className="text-dark-200 ml-2">PDF</span>
+              </div>
+              <div>
+                <span className="text-dark-400">Size:</span>
+                <span className="text-dark-200 ml-2">~{previewData.estimatedPages * 50}KB</span>
+              </div>
+            </div>
+            
+            {emailData.to && (
+              <div className="pt-2 border-t border-dark-600">
+                <div className="text-sm">
+                  <span className="text-dark-400">Email to:</span>
+                  <span className="text-blue-400 ml-2">{emailData.to}</span>
+                </div>
+              </div>
+            )}
+            
+            <div className="pt-2 border-t border-dark-600">
+              <div className="text-sm text-dark-400 mb-2">Report Contents:</div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {previewData.sections.map((section: any) => (
+                  <div key={section.id} className="flex items-center gap-2 text-sm">
+                    <div className="text-dark-400">{section.icon}</div>
+                    <span className="text-dark-200">{section.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {!previewData.hasData && (
+              <div className="pt-2 border-t border-dark-600">
+                <div className="text-sm text-yellow-400 flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4" />
+                  No calculation data available. Please run the calculator first to generate meaningful reports.
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
