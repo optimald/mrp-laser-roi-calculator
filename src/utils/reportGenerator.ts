@@ -80,7 +80,7 @@ export const reportSections: Record<string, ReportSection> = {
   'header': {
     id: 'header',
     name: 'Header & Practice Info',
-    content: (pdf, _inputs, _results, _kpis, _selectedDevice, yPosition, customerInfo, scenario) => {
+    content: (pdf, _inputs, _results, _kpis, _selectedDevice, yPosition, _customerInfo, _scenario) => {
       const pageWidth = pdf.internal.pageSize.getWidth();
       
       // Header
@@ -91,9 +91,9 @@ export const reportSections: Record<string, ReportSection> = {
       pdf.setTextColor(0, 0, 0);
       
       // Practice Information
-      const practiceName = customerInfo?.businessName || 'Your Practice';
-      const clientName = customerInfo?.name || 'Client Name';
-      const clientEmail = customerInfo?.email || 'client@example.com';
+      const practiceName = _customerInfo?.businessName || 'Your Practice';
+      const clientName = _customerInfo?.name || 'Client Name';
+      const clientEmail = _customerInfo?.email || 'client@example.com';
       
       yPosition = addText(pdf, `Practice: ${practiceName}`, 20, 35, pageWidth - 40, 12);
       yPosition = addText(pdf, `Client: ${clientName}`, 20, yPosition, pageWidth - 40, 10);
@@ -101,9 +101,9 @@ export const reportSections: Record<string, ReportSection> = {
       yPosition = addText(pdf, `Report Date: ${new Date().toLocaleDateString()}`, 20, yPosition, pageWidth - 40, 10);
       
       // Scenario Information
-      if (scenario) {
-        yPosition = addText(pdf, `Scenario: ${scenario.name}`, 20, yPosition, pageWidth - 40, 10);
-        yPosition = addText(pdf, scenario.description, 20, yPosition, pageWidth - 40, 9);
+      if (_scenario) {
+        yPosition = addText(pdf, `Scenario: ${_scenario.name}`, 20, yPosition, pageWidth - 40, 10);
+        yPosition = addText(pdf, _scenario.description, 20, yPosition, pageWidth - 40, 9);
       }
       
       yPosition = addLine(pdf, yPosition + 5, pageWidth);
@@ -115,20 +115,20 @@ export const reportSections: Record<string, ReportSection> = {
   'executive-summary': {
     id: 'executive-summary',
     name: 'Executive Summary',
-    content: (pdf, _inputs, _results, kpis, _selectedDevice, yPosition, customerInfo, scenario) => {
+    content: (pdf, _inputs, _results, kpis, _selectedDevice, yPosition, _customerInfo, _scenario) => {
       const pageWidth = pdf.internal.pageSize.getWidth();
       
       yPosition = addSectionHeader(pdf, 'Executive Summary', yPosition, pageWidth);
       
       // Use scenario data if available, otherwise fall back to kpis
-      const summaryData = scenario ? [
+      const summaryData = _scenario ? [
         ['Metric', 'Value'],
-        ['Monthly Revenue', `$${scenario.keyMetrics.monthlyRevenue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`],
-        ['Monthly EBITDA', `$${scenario.keyMetrics.monthlyEBITDA.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`],
-        ['Payback Period', `${scenario.keyMetrics.paybackMonths.toFixed(1)} months`],
-        ['NPV', `$${scenario.keyMetrics.npv.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`],
-        ['Financing', scenario.financing],
-        ['Device', scenario.device]
+        ['Monthly Revenue', `$${_scenario.keyMetrics.monthlyRevenue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`],
+        ['Monthly EBITDA', `$${_scenario.keyMetrics.monthlyEBITDA.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`],
+        ['Payback Period', `${_scenario.keyMetrics.paybackMonths.toFixed(1)} months`],
+        ['NPV', `$${_scenario.keyMetrics.npv.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`],
+        ['Financing', _scenario.financing],
+        ['Device', _scenario.device]
       ] : kpis ? [
         ['Metric', 'Value'],
         ['Monthly Payment', `$${kpis.monthlyPayment.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`],
@@ -144,9 +144,9 @@ export const reportSections: Record<string, ReportSection> = {
       }
       
       // Add scenario description if available
-      if (scenario) {
+      if (_scenario) {
         yPosition += 10;
-        yPosition = addText(pdf, `Scenario Overview: ${scenario.description}`, 20, yPosition, pageWidth - 40, 10);
+        yPosition = addText(pdf, `Scenario Overview: ${_scenario.description}`, 20, yPosition, pageWidth - 40, 10);
       }
       
       return yPosition;
@@ -185,7 +185,7 @@ export const reportSections: Record<string, ReportSection> = {
   'device-info': {
     id: 'device-info',
     name: 'Device Information',
-    content: (pdf, inputs, _results, _kpis, selectedDevice, yPosition, customerInfo, scenario) => {
+    content: (pdf, inputs, _results, _kpis, selectedDevice, yPosition, _customerInfo, _scenario) => {
       const pageWidth = pdf.internal.pageSize.getWidth();
       
       yPosition = addSectionHeader(pdf, 'Device Information', yPosition, pageWidth);
@@ -261,13 +261,13 @@ export const reportSections: Record<string, ReportSection> = {
   'monthly-breakdown': {
     id: 'monthly-breakdown',
     name: 'Monthly P&L Breakdown',
-    content: (pdf, _inputs, results, _kpis, _selectedDevice, yPosition) => {
+    content: (pdf, _inputs, _results, _kpis, _selectedDevice, yPosition) => {
       const pageWidth = pdf.internal.pageSize.getWidth();
       
       yPosition = addSectionHeader(pdf, 'Monthly P&L Summary (First 12 Months)', yPosition, pageWidth);
       
       const tableHeaders = ['Month', 'Treatments', 'Revenue', 'EBITDA', 'Cash Flow', 'Cumulative Cash'];
-      const tableRows = results.slice(0, 12).map(result => [
+      const tableRows = _results.slice(0, 12).map((result: any) => [
         `M${result.month}`,
         result.treatments.toFixed(0),
         `$${result.revenue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`,
@@ -353,7 +353,7 @@ export const reportSections: Record<string, ReportSection> = {
   'charts': {
     id: 'charts',
     name: 'Financial Charts',
-    content: (pdf, _inputs, results, _kpis, _selectedDevice, yPosition) => {
+    content: (pdf, _inputs, _results, _kpis, _selectedDevice, yPosition) => {
       const pageWidth = pdf.internal.pageSize.getWidth();
       
       yPosition = addSectionHeader(pdf, 'Financial Charts', yPosition, pageWidth);
@@ -406,7 +406,7 @@ export const reportSections: Record<string, ReportSection> = {
   'financial-projections': {
     id: 'financial-projections',
     name: 'Financial Projections',
-    content: (pdf, _inputs, results, kpis, _selectedDevice, yPosition) => {
+    content: (pdf, _inputs, _results, kpis, _selectedDevice, yPosition) => {
       const pageWidth = pdf.internal.pageSize.getWidth();
       
       yPosition = addSectionHeader(pdf, 'Financial Projections', yPosition, pageWidth);
