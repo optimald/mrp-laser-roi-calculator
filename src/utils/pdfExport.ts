@@ -6,7 +6,8 @@ export const exportToPDF = async (
   inputs: CalculatorInputs,
   results: MonthlyResults[],
   kpis: KPIs,
-  practiceName: string = 'Your Practice'
+  practiceName: string = 'Your Practice',
+  selectedDevice?: { image_url?: string; model_name?: string; manufacturer?: string; mrp_url?: string } | null
 ) => {
   const pdf = new jsPDF('p', 'mm', 'a4');
   const pageWidth = pdf.internal.pageSize.getWidth();
@@ -33,6 +34,46 @@ export const exportToPDF = async (
     return y + 5;
   };
 
+  // Helper function to load and add image
+  const addImage = async (imageUrl: string, x: number, y: number, width: number, height: number): Promise<boolean> => {
+    try {
+      // Create a temporary image element to load the image
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      
+      return new Promise((resolve) => {
+        img.onload = () => {
+          try {
+            // Convert image to base64
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx?.drawImage(img, 0, 0);
+            const dataURL = canvas.toDataURL('image/jpeg', 0.8);
+            
+            // Add image to PDF
+            pdf.addImage(dataURL, 'JPEG', x, y, width, height);
+            resolve(true);
+          } catch (error) {
+            console.error('Error adding image to PDF:', error);
+            resolve(false);
+          }
+        };
+        
+        img.onerror = () => {
+          console.error('Error loading image:', imageUrl);
+          resolve(false);
+        };
+        
+        img.src = imageUrl;
+      });
+    } catch (error) {
+      console.error('Error in addImage:', error);
+      return false;
+    }
+  };
+
   // Header
   pdf.setFillColor(15, 23, 42);
   pdf.rect(0, 0, pageWidth, 30, 'F');
@@ -57,6 +98,23 @@ export const exportToPDF = async (
 
   // Device Information
   yPosition = addText('Device & Acquisition Details', 20, yPosition + 5, pageWidth - 40, 14);
+  
+  // Add device image if available
+  if (selectedDevice?.image_url) {
+    const imageWidth = 40;
+    const imageHeight = 30;
+    const imageAdded = await addImage(selectedDevice.image_url, 20, yPosition + 3, imageWidth, imageHeight);
+    if (imageAdded) {
+      // Add device details next to the image
+      const textStartX = 70;
+      yPosition = addText(`${selectedDevice.manufacturer} ${selectedDevice.model_name}`, textStartX, yPosition + 8, pageWidth - textStartX - 20, 12);
+      if (selectedDevice.mrp_url) {
+        yPosition = addText(`View on MRP.io: ${selectedDevice.mrp_url}`, textStartX, yPosition, pageWidth - textStartX - 20, 9);
+      }
+      yPosition += 5;
+    }
+  }
+  
   yPosition = addText(`Device MSRP: $${inputs.device.msrp.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`, 20, yPosition + 3, pageWidth - 40, 10);
   yPosition = addText(`Discount: ${inputs.device.discount}%`, 20, yPosition, pageWidth - 40, 10);
   yPosition = addText(`Accessories: $${inputs.device.accessories.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`, 20, yPosition, pageWidth - 40, 10);

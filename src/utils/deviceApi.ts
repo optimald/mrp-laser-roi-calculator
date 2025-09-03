@@ -16,6 +16,8 @@ export interface Device {
   typical_treatment_time: number;
   consumables_per_treatment: number;
   description: string;
+  image_url?: string;
+  mrp_url?: string;
   source_url?: string;
 }
 

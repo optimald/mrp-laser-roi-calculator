@@ -8,7 +8,9 @@
     "warranty_years": 1,
     "typical_treatment_time": 30,
     "consumables_per_treatment": 15,
-    "description": "Multi-application aesthetic laser platform with multiple handpieces for various treatments"
+    "description": "Multi-application aesthetic laser platform with multiple handpieces for various treatments",
+    "image_url": "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=300&fit=crop&crop=center",
+    "mrp_url": "https://mrp.io/devices/cutera-xeo-2018"
   },
   {
     "id": "solta-fraxel-dual-2011",
@@ -19,7 +21,9 @@
     "warranty_years": 1,
     "typical_treatment_time": 45,
     "consumables_per_treatment": 25,
-    "description": "Fractional laser resurfacing system for skin rejuvenation and scar treatment"
+    "description": "Fractional laser resurfacing system for skin rejuvenation and scar treatment",
+    "image_url": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=400&h=300&fit=crop&crop=center",
+    "mrp_url": "https://mrp.io/devices/solta-fraxel-dual-2011"
   },
   {
     "id": "lumenis-m22-2020",
@@ -30,7 +34,9 @@
     "warranty_years": 2,
     "typical_treatment_time": 30,
     "consumables_per_treatment": 22,
-    "description": "Multi-application platform with IPL, laser, and RF technologies"
+    "description": "Multi-application platform with IPL, laser, and RF technologies",
+    "image_url": "https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=400&h=300&fit=crop&crop=center",
+    "mrp_url": "https://mrp.io/devices/lumenis-m22-2020"
   },
   {
     "id": "candela-gentlelase-pro-2019",
@@ -41,6 +47,8 @@
     "warranty_years": 2,
     "typical_treatment_time": 15,
     "consumables_per_treatment": 12,
-    "description": "Alexandrite laser for hair removal and vascular treatments"
+    "description": "Alexandrite laser for hair removal and vascular treatments",
+    "image_url": "https://images.unsplash.com/photo-1551601651-2a8555f1a136?w=400&h=300&fit=crop&crop=center",
+    "mrp_url": "https://mrp.io/devices/candela-gentlelase-pro-2019"
   }
 ]

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronDown, RefreshCw } from 'lucide-react';
+import { ChevronDown, RefreshCw, ExternalLink } from 'lucide-react';
 import { fetchDevicesFromMRP, refreshDeviceData } from '../utils/deviceApi';
 
 export interface Device {
@@ -12,6 +12,8 @@ export interface Device {
   typical_treatment_time: number;
   consumables_per_treatment: number;
   description: string;
+  image_url?: string;
+  mrp_url?: string;
 }
 
 interface DeviceSelectorProps {
@@ -183,58 +185,89 @@ const DeviceSelector: React.FC<DeviceSelectorProps> = ({ selectedDevice, onDevic
 
       {selectedDevice && (
         <div className="mt-3 p-3 bg-dark-800 border border-dark-600 rounded-md">
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center justify-between mb-3">
             <h4 className="font-medium text-dark-100">Selected Device</h4>
-            <button
-              onClick={() => onDeviceSelect(null)}
-              className="text-xs text-dark-400 hover:text-dark-200"
-            >
-              Clear Selection
-            </button>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <span className="text-dark-400">Model:</span>
-              <div className="font-medium text-dark-100">
-                {selectedDevice.manufacturer} {selectedDevice.model_name}
-              </div>
-            </div>
-            <div>
-              <span className="text-dark-400">MSRP:</span>
-              <div className="font-medium text-green-400">
-                {formatPrice(selectedDevice.msrp)}
-              </div>
-            </div>
-            <div>
-              <span className="text-dark-400">Condition:</span>
-              <div className="text-dark-200 capitalize">
-                {selectedDevice.condition}
-              </div>
-            </div>
-            <div>
-              <span className="text-dark-400">Warranty:</span>
-              <div className="text-dark-200">
-                {selectedDevice.warranty_years} years
-              </div>
-            </div>
-            <div>
-              <span className="text-dark-400">Treatment Time:</span>
-              <div className="text-dark-200">
-                {selectedDevice.typical_treatment_time} minutes
-              </div>
-            </div>
-            <div>
-              <span className="text-dark-400">Consumables:</span>
-              <div className="text-dark-200">
-                ${selectedDevice.consumables_per_treatment}/treatment
-              </div>
+            <div className="flex items-center gap-2">
+              {selectedDevice.mrp_url && (
+                <a
+                  href={selectedDevice.mrp_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1"
+                >
+                  <ExternalLink className="h-3 w-3" />
+                  View on MRP.io
+                </a>
+              )}
+              <button
+                onClick={() => onDeviceSelect(null)}
+                className="text-xs text-dark-400 hover:text-dark-200"
+              >
+                Clear Selection
+              </button>
             </div>
           </div>
           
-          <div className="mt-3 pt-3 border-t border-dark-600">
-            <div className="text-sm text-dark-300">
-              {selectedDevice.description}
+          <div className="flex gap-4">
+            {selectedDevice.image_url && (
+              <div className="flex-shrink-0">
+                <img
+                  src={selectedDevice.image_url}
+                  alt={`${selectedDevice.manufacturer} ${selectedDevice.model_name}`}
+                  className="w-24 h-18 object-cover rounded-md border border-dark-600"
+                  onError={(e) => {
+                    // Hide image if it fails to load
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+              </div>
+            )}
+            
+            <div className="flex-1">
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="text-dark-400">Model:</span>
+                  <div className="font-medium text-dark-100">
+                    {selectedDevice.manufacturer} {selectedDevice.model_name}
+                  </div>
+                </div>
+                <div>
+                  <span className="text-dark-400">MSRP:</span>
+                  <div className="font-medium text-green-400">
+                    {formatPrice(selectedDevice.msrp)}
+                  </div>
+                </div>
+                <div>
+                  <span className="text-dark-400">Condition:</span>
+                  <div className="text-dark-200 capitalize">
+                    {selectedDevice.condition}
+                  </div>
+                </div>
+                <div>
+                  <span className="text-dark-400">Warranty:</span>
+                  <div className="text-dark-200">
+                    {selectedDevice.warranty_years} years
+                  </div>
+                </div>
+                <div>
+                  <span className="text-dark-400">Treatment Time:</span>
+                  <div className="text-dark-200">
+                    {selectedDevice.typical_treatment_time} minutes
+                  </div>
+                </div>
+                <div>
+                  <span className="text-dark-400">Consumables:</span>
+                  <div className="text-dark-200">
+                    ${selectedDevice.consumables_per_treatment}/treatment
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-3 pt-3 border-t border-dark-600">
+                <div className="text-sm text-dark-300">
+                  {selectedDevice.description}
+                </div>
+              </div>
             </div>
           </div>
         </div>
