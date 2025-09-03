@@ -76,13 +76,13 @@ export const exportToPDF = async (
 
   // Header
   pdf.setFillColor(15, 23, 42);
-  pdf.rect(0, 0, pageWidth, 30, 'F');
+  pdf.rect(0, 0, pageWidth, 25, 'F');
   pdf.setTextColor(255, 255, 255);
-  yPosition = addText('MRP Aesthetics Laser ROI Calculator', 20, 15, pageWidth - 40, 16);
+  yPosition = addText('MRP Aesthetics Laser ROI Calculator', 20, 12, pageWidth - 40, 14);
   pdf.setTextColor(0, 0, 0);
 
-  // Practice Information
-  yPosition = addText(`Practice: ${practiceName}`, 20, yPosition + 10, pageWidth - 40, 12);
+  // Practice Information - Start after header with proper spacing
+  yPosition = addText(`Practice: ${practiceName}`, 20, 35, pageWidth - 40, 12);
   yPosition = addText(`Report Date: ${new Date().toLocaleDateString()}`, 20, yPosition, pageWidth - 40, 10);
   yPosition = addLine(yPosition + 5);
 
