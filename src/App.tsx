@@ -4,6 +4,7 @@ import { defaultInputs, calculateAllResults, calculateKPIs } from './utils/calcu
 import { exportToPDF } from './utils/pdfExport';
 import InputPanel from './components/InputPanel';
 import ResultsPanel from './components/ResultsPanel';
+import ReportTab from './components/ReportTab';
 import Header from './components/Header';
 import './App.css';
 
@@ -11,6 +12,8 @@ function App() {
   const [inputs, setInputs] = useState<CalculatorInputs>(defaultInputs);
   const [results, setResults] = useState<MonthlyResults[]>([]);
   const [kpis, setKpis] = useState<KPIs | null>(null);
+  const [activeTab, setActiveTab] = useState<'calculator' | 'reports'>('calculator');
+  const [selectedDevice, setSelectedDevice] = useState<any>(null);
 
   useEffect(() => {
     const monthlyResults = calculateAllResults(inputs, 60);
@@ -32,27 +35,48 @@ function App() {
 
   const handleExportPDF = () => {
     if (kpis) {
-      exportToPDF(inputs, results, kpis, 'Your Practice');
+      exportToPDF(inputs, results, kpis, 'Your Practice', selectedDevice);
     }
+  };
+
+  const handleDeviceSelect = (device: any) => {
+    setSelectedDevice(device);
   };
 
   return (
     <div className="min-h-screen bg-dark-950 text-dark-50">
-      <Header onExportPDF={handleExportPDF} />
-      <div className="flex h-screen pt-16">
-        {/* Left Panel - Inputs */}
-        <div className="w-1/3 bg-dark-900 border-r border-dark-700 overflow-y-auto">
-          <InputPanel 
-            inputs={inputs} 
-            onInputChange={handleInputChange}
+      <Header 
+        onExportPDF={handleExportPDF} 
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+      />
+      
+      {activeTab === 'calculator' ? (
+        <div className="flex h-screen pt-16">
+          {/* Left Panel - Inputs */}
+          <div className="w-1/3 bg-dark-900 border-r border-dark-700 overflow-y-auto">
+            <InputPanel 
+              inputs={inputs} 
+              onInputChange={handleInputChange}
+              onDeviceSelect={handleDeviceSelect}
+            />
+          </div>
+          
+          {/* Right Panel - Results */}
+          <div className="w-2/3 bg-dark-950 overflow-y-auto">
+            <ResultsPanel results={results} kpis={kpis} />
+          </div>
+        </div>
+      ) : (
+        <div className="pt-16">
+          <ReportTab 
+            inputs={inputs}
+            results={results}
+            kpis={kpis}
+            selectedDevice={selectedDevice}
           />
         </div>
-        
-        {/* Right Panel - Results */}
-        <div className="w-2/3 bg-dark-950 overflow-y-auto">
-          <ResultsPanel results={results} kpis={kpis} />
-        </div>
-      </div>
+      )}
     </div>
   );
 }
