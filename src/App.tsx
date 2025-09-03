@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import type { CalculatorInputs, MonthlyResults, KPIs } from './utils/calculations';
 import { defaultInputs, calculateAllResults, calculateKPIs } from './utils/calculations';
 import { exportToPDF } from './utils/pdfExport';
@@ -8,12 +9,18 @@ import ReportTab from './components/ReportTab';
 import Header from './components/Header';
 import './App.css';
 
-function App() {
+// Main app component with routing logic
+function AppContent() {
   const [inputs, setInputs] = useState<CalculatorInputs>(defaultInputs);
   const [results, setResults] = useState<MonthlyResults[]>([]);
   const [kpis, setKpis] = useState<KPIs | null>(null);
-  const [activeTab, setActiveTab] = useState<'calculator' | 'reports'>('calculator');
   const [selectedDevice, setSelectedDevice] = useState<any>(null);
+  
+  const location = useLocation();
+  const navigate = useNavigate();
+  
+  // Determine active tab based on current route
+  const activeTab = location.pathname === '/reports' ? 'reports' : 'calculator';
 
   useEffect(() => {
     const monthlyResults = calculateAllResults(inputs, 60);
@@ -43,41 +50,62 @@ function App() {
     setSelectedDevice(device);
   };
 
+  const handleTabChange = (tab: 'calculator' | 'reports') => {
+    if (tab === 'reports') {
+      navigate('/reports');
+    } else {
+      navigate('/');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-dark-950 text-dark-50">
       <Header 
         onExportPDF={handleExportPDF} 
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={handleTabChange}
       />
       
-      {activeTab === 'calculator' ? (
-        <div className="flex h-screen pt-16">
-          {/* Left Panel - Inputs */}
-          <div className="w-1/3 bg-dark-900 border-r border-dark-700 overflow-y-auto">
-            <InputPanel 
-              inputs={inputs} 
-              onInputChange={handleInputChange}
-              onDeviceSelect={handleDeviceSelect}
+      <Routes>
+        <Route path="/" element={
+          <div className="flex h-screen pt-16">
+            {/* Left Panel - Inputs */}
+            <div className="w-1/3 bg-dark-900 border-r border-dark-700 overflow-y-auto">
+              <InputPanel 
+                inputs={inputs} 
+                onInputChange={handleInputChange}
+                onDeviceSelect={handleDeviceSelect}
+              />
+            </div>
+            
+            {/* Right Panel - Results */}
+            <div className="w-2/3 bg-dark-950 overflow-y-auto">
+              <ResultsPanel results={results} kpis={kpis} />
+            </div>
+          </div>
+        } />
+        
+        <Route path="/reports" element={
+          <div className="pt-16">
+            <ReportTab 
+              inputs={inputs}
+              results={results}
+              kpis={kpis}
+              selectedDevice={selectedDevice}
             />
           </div>
-          
-          {/* Right Panel - Results */}
-          <div className="w-2/3 bg-dark-950 overflow-y-auto">
-            <ResultsPanel results={results} kpis={kpis} />
-          </div>
-        </div>
-      ) : (
-        <div className="pt-16">
-          <ReportTab 
-            inputs={inputs}
-            results={results}
-            kpis={kpis}
-            selectedDevice={selectedDevice}
-          />
-        </div>
-      )}
+        } />
+      </Routes>
     </div>
+  );
+}
+
+// Root App component with Router
+function App() {
+  return (
+    <Router>
+      <AppContent />
+    </Router>
   );
 }
 
