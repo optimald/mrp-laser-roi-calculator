@@ -426,10 +426,10 @@ export const defaultInputs: CalculatorInputs = {
   },
   financing: {
     purchaseMethod: 'loan',
-    downPayment: 20,
+    downPayment: 30,
     downPaymentType: 'percent',
-    apr: 6.5,
-    termMonths: 60,
+    apr: 5.5,
+    termMonths: 84,
     paymentFrequency: 'monthly',
     balloonResidual: 0,
     balloonType: 'dollar',
@@ -448,16 +448,16 @@ export const defaultInputs: CalculatorInputs = {
     seasonality: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
   },
   pricing: {
-    listPricePerTreatment: 350,
+    listPricePerTreatment: 500,
     discountPercent: 5,
     packages: [
-      { sessions: 6, price: 1800, attachRate: 30 },
-      { sessions: 12, price: 3000, attachRate: 20 }
+      { sessions: 6, price: 2500, attachRate: 30 },
+      { sessions: 12, price: 4500, attachRate: 20 }
     ],
-    membershipMRR: 200,
-    membershipPercent: 15,
-    upsellAvgPerTx: 75,
-    upsellAttachRate: 25
+    membershipMRR: 300,
+    membershipPercent: 20,
+    upsellAvgPerTx: 100,
+    upsellAttachRate: 30
   },
   variableCosts: {
     consumables: 15,
