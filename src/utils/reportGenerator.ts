@@ -4,7 +4,7 @@ import type { CalculatorInputs, MonthlyResults, KPIs } from './calculations';
 export interface ReportSection {
   id: string;
   name: string;
-  content: (pdf: jsPDF, inputs: CalculatorInputs, results: MonthlyResults[], kpis: KPIs | null, selectedDevice: any, yPosition: number) => number;
+  content: (pdf: jsPDF, inputs: CalculatorInputs, results: MonthlyResults[], kpis: KPIs | null, selectedDevice: any, yPosition: number, customerInfo?: any, scenario?: any) => number;
 }
 
 export interface ReportTemplate {
@@ -80,7 +80,7 @@ export const reportSections: Record<string, ReportSection> = {
   'header': {
     id: 'header',
     name: 'Header & Practice Info',
-    content: (pdf, _inputs, _results, _kpis, _selectedDevice, yPosition) => {
+    content: (pdf, _inputs, _results, _kpis, _selectedDevice, yPosition, customerInfo, scenario) => {
       const pageWidth = pdf.internal.pageSize.getWidth();
       
       // Header
@@ -91,8 +91,21 @@ export const reportSections: Record<string, ReportSection> = {
       pdf.setTextColor(0, 0, 0);
       
       // Practice Information
-      yPosition = addText(pdf, 'Practice: Your Practice', 20, 35, pageWidth - 40, 12);
+      const practiceName = customerInfo?.businessName || 'Your Practice';
+      const clientName = customerInfo?.name || 'Client Name';
+      const clientEmail = customerInfo?.email || 'client@example.com';
+      
+      yPosition = addText(pdf, `Practice: ${practiceName}`, 20, 35, pageWidth - 40, 12);
+      yPosition = addText(pdf, `Client: ${clientName}`, 20, yPosition, pageWidth - 40, 10);
+      yPosition = addText(pdf, `Email: ${clientEmail}`, 20, yPosition, pageWidth - 40, 10);
       yPosition = addText(pdf, `Report Date: ${new Date().toLocaleDateString()}`, 20, yPosition, pageWidth - 40, 10);
+      
+      // Scenario Information
+      if (scenario) {
+        yPosition = addText(pdf, `Scenario: ${scenario.name}`, 20, yPosition, pageWidth - 40, 10);
+        yPosition = addText(pdf, scenario.description, 20, yPosition, pageWidth - 40, 9);
+      }
+      
       yPosition = addLine(pdf, yPosition + 5, pageWidth);
       
       return yPosition;
@@ -102,23 +115,38 @@ export const reportSections: Record<string, ReportSection> = {
   'executive-summary': {
     id: 'executive-summary',
     name: 'Executive Summary',
-    content: (pdf, _inputs, _results, kpis, _selectedDevice, yPosition) => {
+    content: (pdf, _inputs, _results, kpis, _selectedDevice, yPosition, customerInfo, scenario) => {
       const pageWidth = pdf.internal.pageSize.getWidth();
       
       yPosition = addSectionHeader(pdf, 'Executive Summary', yPosition, pageWidth);
       
-      if (kpis) {
-        const summaryData = [
-          ['Metric', 'Value'],
-          ['Monthly Payment', `$${kpis.monthlyPayment.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`],
-          ['Monthly Revenue', `$${kpis.monthlyRevenue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`],
-          ['Monthly EBITDA', `$${kpis.monthlyEBITDA.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`],
-          ['Breakeven Treatments/Day', kpis.breakevenTreatmentsPerDay.toFixed(1)],
-          ['Payback Period', `${kpis.paybackMonths.toFixed(1)} months`],
-          ['NPV', `$${kpis.npv.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`]
-        ];
-        
+      // Use scenario data if available, otherwise fall back to kpis
+      const summaryData = scenario ? [
+        ['Metric', 'Value'],
+        ['Monthly Revenue', `$${scenario.keyMetrics.monthlyRevenue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`],
+        ['Monthly EBITDA', `$${scenario.keyMetrics.monthlyEBITDA.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`],
+        ['Payback Period', `${scenario.keyMetrics.paybackMonths.toFixed(1)} months`],
+        ['NPV', `$${scenario.keyMetrics.npv.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`],
+        ['Financing', scenario.financing],
+        ['Device', scenario.device]
+      ] : kpis ? [
+        ['Metric', 'Value'],
+        ['Monthly Payment', `$${kpis.monthlyPayment.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`],
+        ['Monthly Revenue', `$${kpis.monthlyRevenue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`],
+        ['Monthly EBITDA', `$${kpis.monthlyEBITDA.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`],
+        ['Breakeven Treatments/Day', kpis.breakevenTreatmentsPerDay.toFixed(1)],
+        ['Payback Period', `${kpis.paybackMonths.toFixed(1)} months`],
+        ['NPV', `$${kpis.npv.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`]
+      ] : [];
+      
+      if (summaryData.length > 0) {
         yPosition = addTable(pdf, summaryData[0], summaryData.slice(1), yPosition, pageWidth);
+      }
+      
+      // Add scenario description if available
+      if (scenario) {
+        yPosition += 10;
+        yPosition = addText(pdf, `Scenario Overview: ${scenario.description}`, 20, yPosition, pageWidth - 40, 10);
       }
       
       return yPosition;
@@ -157,10 +185,33 @@ export const reportSections: Record<string, ReportSection> = {
   'device-info': {
     id: 'device-info',
     name: 'Device Information',
-    content: (pdf, inputs, _results, _kpis, selectedDevice, yPosition) => {
+    content: (pdf, inputs, _results, _kpis, selectedDevice, yPosition, customerInfo, scenario) => {
       const pageWidth = pdf.internal.pageSize.getWidth();
       
       yPosition = addSectionHeader(pdf, 'Device Information', yPosition, pageWidth);
+      
+      // Device Image Placeholder
+      if (selectedDevice?.image_url) {
+        try {
+          // Add image placeholder box
+          pdf.setDrawColor(200, 200, 200);
+          pdf.setFillColor(240, 240, 240);
+          const imageWidth = 60;
+          const imageHeight = 40;
+          const imageX = pageWidth - imageWidth - 20;
+          pdf.rect(imageX, yPosition, imageWidth, imageHeight, 'FD');
+          
+          // Add placeholder text
+          pdf.setTextColor(150, 150, 150);
+          pdf.setFontSize(8);
+          pdf.text('Device Image', imageX + imageWidth/2 - 15, yPosition + imageHeight/2);
+          pdf.setTextColor(0, 0, 0);
+          
+          yPosition += imageHeight + 10;
+        } catch (error) {
+          console.log('Could not add device image:', error);
+        }
+      }
       
       // Device details
       const deviceData = [
@@ -307,7 +358,9 @@ export const generateTemplateReport = async (
   kpis: KPIs | null,
   selectedDevice: any,
   sections: string[],
-  templateName: string
+  templateName: string,
+  customerInfo?: any,
+  scenario?: any
 ) => {
   const pdf = new jsPDF('p', 'mm', 'a4');
   const pageHeight = pdf.internal.pageSize.getHeight();
@@ -340,7 +393,9 @@ export const emailTemplateReport = async (
   selectedDevice: any,
   sections: string[],
   templateName: string,
-  _emailData: any
+  _emailData: any,
+  customerInfo?: any,
+  scenario?: any
 ) => {
   // For now, just generate and download the report
   // In a real implementation, this would integrate with an email service

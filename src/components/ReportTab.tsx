@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { FileText, Download, Mail, Settings, Eye, ClipboardList, BarChart3, Target, Microscope, DollarSign, TrendingUp, FileText as FileTextIcon, Globe, AlertTriangle, ChevronDown, X, Check } from 'lucide-react';
+import { FileText, Download, Mail, Settings, Eye, ClipboardList, BarChart3, Target, Microscope, DollarSign, TrendingUp, FileText as FileTextIcon, Globe, AlertTriangle, ChevronDown, X, Check, Minimize2, Maximize2 } from 'lucide-react';
 import type { CalculatorInputs, MonthlyResults, KPIs } from '../utils/calculations';
 import { generateTemplateReport, emailTemplateReport } from '../utils/reportGenerator';
 
@@ -78,6 +78,11 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
     subject: 'MRP Aesthetics Laser ROI Analysis',
     message: 'Please find attached the ROI analysis report for your review.'
   });
+  const [customerInfo, setCustomerInfo] = useState({
+    name: '',
+    businessName: '',
+    email: ''
+  });
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -95,48 +100,52 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
     };
   }, []);
 
-  // Sample scenarios data
-  const scenarios: Scenario[] = [
-    {
-      id: 'scenario-a',
-      name: 'Scenario A - Conservative',
-      description: 'Conservative estimates with moderate growth',
-      device: selectedDevice ? `${selectedDevice.manufacturer} ${selectedDevice.model_name}` : 'Cutera XEO 2018',
-      financing: '30% Down, 5.5% APR, 84 months',
-      keyMetrics: {
-        monthlyRevenue: 85000,
-        monthlyEBITDA: 48000,
-        paybackMonths: 5.2,
-        npv: 1250000
+  // Device-specific scenarios data
+  const scenarios: Scenario[] = useMemo(() => {
+    const deviceName = selectedDevice ? `${selectedDevice.manufacturer} ${selectedDevice.model_name}` : 'Selected Device';
+    
+    return [
+      {
+        id: 'scenario-a',
+        name: 'Scenario A - Conservative',
+        description: 'Conservative estimates with moderate growth',
+        device: deviceName,
+        financing: '30% Down, 5.5% APR, 84 months',
+        keyMetrics: {
+          monthlyRevenue: 85000,
+          monthlyEBITDA: 48000,
+          paybackMonths: 5.2,
+          npv: 1250000
+        }
+      },
+      {
+        id: 'scenario-b',
+        name: 'Scenario B - Optimistic',
+        description: 'Optimistic projections with high growth',
+        device: deviceName,
+        financing: '20% Down, 6.5% APR, 60 months',
+        keyMetrics: {
+          monthlyRevenue: 120000,
+          monthlyEBITDA: 75000,
+          paybackMonths: 3.8,
+          npv: 2100000
+        }
+      },
+      {
+        id: 'scenario-c',
+        name: 'Scenario C - Aggressive',
+        description: 'Aggressive expansion with premium pricing',
+        device: deviceName,
+        financing: '15% Down, 7.0% APR, 48 months',
+        keyMetrics: {
+          monthlyRevenue: 150000,
+          monthlyEBITDA: 95000,
+          paybackMonths: 2.9,
+          npv: 2800000
+        }
       }
-    },
-    {
-      id: 'scenario-b',
-      name: 'Scenario B - Optimistic',
-      description: 'Optimistic projections with high growth',
-      device: selectedDevice ? `${selectedDevice.manufacturer} ${selectedDevice.model_name}` : 'Lumenis M22 2020',
-      financing: '20% Down, 6.5% APR, 60 months',
-      keyMetrics: {
-        monthlyRevenue: 120000,
-        monthlyEBITDA: 75000,
-        paybackMonths: 3.8,
-        npv: 2100000
-      }
-    },
-    {
-      id: 'scenario-c',
-      name: 'Scenario C - Aggressive',
-      description: 'Aggressive expansion with premium pricing',
-      device: selectedDevice ? `${selectedDevice.manufacturer} ${selectedDevice.model_name}` : 'Candela GentleLASE Pro 2019',
-      financing: '15% Down, 7.0% APR, 48 months',
-      keyMetrics: {
-        monthlyRevenue: 150000,
-        monthlyEBITDA: 95000,
-        paybackMonths: 2.9,
-        npv: 2800000
-      }
-    }
-  ];
+    ];
+  }, [selectedDevice]);
 
   // Report disclaimers
   const reportDisclaimers: Record<string, string> = {
@@ -188,7 +197,8 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
     setIsGenerating(true);
     try {
       const sections = getActiveSections();
-      await generateTemplateReport(inputs, results, kpis, selectedDevice, sections, selectedTemplate.name);
+      const currentScenario = scenarios.find(s => s.id === selectedScenario);
+      await generateTemplateReport(inputs, results, kpis, selectedDevice, sections, selectedTemplate.name, customerInfo, currentScenario);
     } catch (error) {
       console.error('Error generating report:', error);
     } finally {
@@ -202,7 +212,8 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
     setIsGenerating(true);
     try {
       const sections = getActiveSections();
-      await emailTemplateReport(inputs, results, kpis, selectedDevice, sections, selectedTemplate.name, emailData);
+      const currentScenario = scenarios.find(s => s.id === selectedScenario);
+      await emailTemplateReport(inputs, results, kpis, selectedDevice, sections, selectedTemplate.name, emailData, customerInfo, currentScenario);
     } catch (error) {
       console.error('Error emailing report:', error);
     } finally {
@@ -251,8 +262,8 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
       totalSections: sections.length,
       scenario: currentScenario,
       dummyContent: {
-        practiceName: "Aesthetic Laser Center",
-        deviceName: currentScenario?.device || "Cutera XEO 2018",
+        practiceName: customerInfo?.businessName || "Aesthetic Laser Center",
+        deviceName: selectedDevice ? `${selectedDevice.manufacturer} ${selectedDevice.model_name}` : "No Device Selected",
         monthlyRevenue: currentScenario?.keyMetrics.monthlyRevenue || 85000,
         monthlyEBITDA: currentScenario?.keyMetrics.monthlyEBITDA || 48000,
         paybackMonths: currentScenario?.keyMetrics.paybackMonths || 5.2,
@@ -271,24 +282,59 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
             <h2 className="text-2xl font-bold text-dark-100">Report Generator</h2>
             <p className="text-dark-400 mt-1">Create professional reports to replace PandaDoc</p>
           </div>
-          <div className="flex items-center gap-3">
+          
+          <div className="flex items-center space-x-6">
+            {/* Navigation Tabs */}
+            <div className="flex items-center space-x-1 bg-dark-700 rounded-lg p-1">
+              <button
+                onClick={() => window.location.href = '/'}
+                className="px-4 py-2 rounded-md text-sm font-medium transition-colors text-dark-300 hover:text-dark-100 hover:bg-dark-600"
+              >
+                Calculator
+              </button>
+              <button
+                className="px-4 py-2 rounded-md text-sm font-medium transition-colors bg-blue-600 text-white"
+              >
+                Reports
+              </button>
+            </div>
+            
+            <div className="flex items-center gap-3">
             {/* Scenario Mega Dropdown */}
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setShowScenarioDropdown(!showScenarioDropdown)}
                 className="btn-secondary flex items-center gap-2 min-w-[200px] justify-between"
+                disabled={!selectedDevice}
+                title={!selectedDevice ? "Please select a device from the Calculator tab first" : ""}
               >
-                <span>{scenarios.find(s => s.id === selectedScenario)?.name}</span>
+                <span>
+                  {selectedDevice 
+                    ? scenarios.find(s => s.id === selectedScenario)?.name 
+                    : "Select Device First"
+                  }
+                </span>
                 <ChevronDown className="h-4 w-4" />
               </button>
               
               {showScenarioDropdown && (
                 <div className="absolute top-full left-0 mt-2 w-96 bg-dark-800 border border-dark-600 rounded-lg shadow-lg z-50">
                   <div className="p-3 border-b border-dark-600">
-                    <h3 className="font-semibold text-dark-100">Select Scenario</h3>
+                    <h3 className="font-semibold text-dark-100">
+                      {selectedDevice ? 'Select Scenario' : 'Device Required'}
+                    </h3>
                   </div>
                   <div className="max-h-80 overflow-y-auto">
-                    {scenarios.map((scenario) => (
+                    {!selectedDevice ? (
+                      <div className="p-4 text-center">
+                        <div className="text-yellow-400 mb-2">⚠️</div>
+                        <div className="text-dark-200 mb-2">No device selected</div>
+                        <div className="text-sm text-dark-400">
+                          Please go to the Calculator tab and select a device first to generate scenarios.
+                        </div>
+                      </div>
+                    ) : (
+                      scenarios.map((scenario) => (
                       <button
                         key={scenario.id}
                         onClick={() => {
@@ -323,7 +369,8 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
                           </div>
                         </div>
                       </button>
-                    ))}
+                      ))
+                    )}
                   </div>
                 </div>
               )}
@@ -331,16 +378,18 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
 
             <button
               onClick={handleGenerateReport}
-              disabled={isGenerating || !kpis}
+              disabled={isGenerating || !kpis || !selectedDevice}
               className="btn-primary flex items-center gap-2"
+              title={!selectedDevice ? "Please select a device from the Calculator tab first" : ""}
             >
               <Download className="h-4 w-4" />
               {isGenerating ? 'Generating...' : 'Export PDF'}
             </button>
             <button
               onClick={() => setShowEmailModal(true)}
-              disabled={isGenerating || !kpis}
+              disabled={isGenerating || !kpis || !selectedDevice}
               className="btn-secondary flex items-center gap-2"
+              title={!selectedDevice ? "Please select a device from the Calculator tab first" : ""}
             >
               <Mail className="h-4 w-4" />
               Email Report
@@ -348,10 +397,11 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
             <button
               onClick={() => setShowSidebar(!showSidebar)}
               className="btn-secondary flex items-center gap-2"
+              title={showSidebar ? 'Minimize sidebar' : 'Maximize sidebar'}
             >
-              <Settings className="h-4 w-4" />
-              {showSidebar ? 'Hide' : 'Show'} Settings
+              {showSidebar ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
             </button>
+            </div>
           </div>
         </div>
       </div>
@@ -361,6 +411,52 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
         {showSidebar && (
           <div className="w-80 bg-dark-800 border-r border-dark-600 overflow-y-auto">
             <div className="p-4 space-y-6">
+              {/* Customer Information */}
+              <div>
+                <h3 className="text-lg font-semibold text-dark-100 mb-4 flex items-center gap-2">
+                  <ClipboardList className="h-5 w-5" />
+                  Customer Information
+                </h3>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-sm font-medium text-dark-300 mb-1">
+                      Customer Name
+                    </label>
+                    <input
+                      type="text"
+                      value={customerInfo.name}
+                      onChange={(e) => setCustomerInfo(prev => ({ ...prev, name: e.target.value }))}
+                      className="input-field"
+                      placeholder="John Smith"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-dark-300 mb-1">
+                      Business Name
+                    </label>
+                    <input
+                      type="text"
+                      value={customerInfo.businessName}
+                      onChange={(e) => setCustomerInfo(prev => ({ ...prev, businessName: e.target.value }))}
+                      className="input-field"
+                      placeholder="Aesthetic Laser Center"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-dark-300 mb-1">
+                      Email Address
+                    </label>
+                    <input
+                      type="email"
+                      value={customerInfo.email}
+                      onChange={(e) => setCustomerInfo(prev => ({ ...prev, email: e.target.value }))}
+                      className="input-field"
+                      placeholder="john@lasercenter.com"
+                    />
+                  </div>
+                </div>
+              </div>
+
               {/* Template Selection */}
               <div>
                 <h3 className="text-lg font-semibold text-dark-100 mb-4 flex items-center gap-2">
@@ -526,6 +622,30 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
             </div>
             
             <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-dark-300 mb-2">
+                  Client Name
+                </label>
+                <input
+                  type="text"
+                  value={customerInfo.name}
+                  onChange={(e) => setCustomerInfo(prev => ({ ...prev, name: e.target.value }))}
+                  className="input-field"
+                  placeholder="John Smith"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-dark-300 mb-2">
+                  Business Name
+                </label>
+                <input
+                  type="text"
+                  value={customerInfo.businessName}
+                  onChange={(e) => setCustomerInfo(prev => ({ ...prev, businessName: e.target.value }))}
+                  className="input-field"
+                  placeholder="Aesthetic Laser Center"
+                />
+              </div>
               <div>
                 <label className="block text-sm font-medium text-dark-300 mb-2">
                   Recipient Email
