@@ -356,21 +356,38 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
               <Mail className="h-4 w-4" />
               Email Report
             </button>
-            <button
-              onClick={() => setShowSidebar(!showSidebar)}
-              className="btn-secondary flex items-center gap-2"
-              title={showSidebar ? 'Minimize sidebar' : 'Maximize sidebar'}
-            >
-              {showSidebar ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-            </button>
           </div>
         </div>
       </div>
 
       <div className="flex flex-1 overflow-hidden">
+        {/* Show Sidebar Button (when collapsed) */}
+        {!showSidebar && (
+          <button
+            onClick={() => setShowSidebar(true)}
+            className="fixed left-4 top-24 z-40 bg-dark-800 hover:bg-dark-700 border border-dark-600 rounded-lg p-2 text-dark-300 hover:text-dark-100 transition-colors"
+            title="Show sidebar"
+          >
+            <Maximize2 className="h-4 w-4" />
+          </button>
+        )}
+
         {/* Sidebar */}
         {showSidebar && (
           <div className="w-80 bg-dark-800 border-r border-dark-600 overflow-y-auto">
+            {/* Sidebar Header */}
+            <div className="p-4 border-b border-dark-600">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-dark-100">Report Settings</h3>
+                <button
+                  onClick={() => setShowSidebar(false)}
+                  className="text-dark-400 hover:text-dark-200 transition-colors"
+                  title="Minimize sidebar"
+                >
+                  <Minimize2 className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
             <div className="p-4 space-y-6">
               {/* Customer Information */}
               <div>

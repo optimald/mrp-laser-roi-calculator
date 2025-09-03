@@ -28,6 +28,26 @@ const Header: React.FC<HeaderProps> = ({ onExportPDF, activeTab, onTabChange }) 
         </div>
         
         <div className="flex items-center space-x-6">
+          {/* Action Buttons */}
+          <div className="flex items-center space-x-3">
+            {activeTab === 'calculator' && (
+              <>
+                <div className="text-sm text-dark-400">
+                  <span className="font-medium">Scenario:</span> A
+                </div>
+                <button 
+                  onClick={onExportPDF}
+                  className="btn-secondary text-sm"
+                >
+                  Export PDF
+                </button>
+                <button className="btn-primary text-sm">
+                  Compare Scenarios
+                </button>
+              </>
+            )}
+          </div>
+          
           {/* Navigation Tabs */}
           <div className="flex items-center space-x-1 bg-dark-800 rounded-lg p-1">
             <button
@@ -50,26 +70,6 @@ const Header: React.FC<HeaderProps> = ({ onExportPDF, activeTab, onTabChange }) 
             >
               Reports
             </button>
-          </div>
-          
-          {/* Action Buttons */}
-          <div className="flex items-center space-x-3">
-            {activeTab === 'calculator' && (
-              <>
-                <div className="text-sm text-dark-400">
-                  <span className="font-medium">Scenario:</span> A
-                </div>
-                <button 
-                  onClick={onExportPDF}
-                  className="btn-secondary text-sm"
-                >
-                  Export PDF
-                </button>
-                <button className="btn-primary text-sm">
-                  Compare Scenarios
-                </button>
-              </>
-            )}
           </div>
         </div>
       </div>
