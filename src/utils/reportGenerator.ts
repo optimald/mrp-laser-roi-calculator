@@ -376,7 +376,7 @@ export const generateTemplateReport = async (
         yPosition = 20;
       }
       
-      yPosition = section.content(pdf, inputs, results, kpis, selectedDevice, yPosition);
+      yPosition = section.content(pdf, inputs, results, kpis, selectedDevice, yPosition, customerInfo, scenario);
     }
   }
   
@@ -400,5 +400,5 @@ export const emailTemplateReport = async (
   // For now, just generate and download the report
   // In a real implementation, this would integrate with an email service
   console.log('Email functionality not yet implemented. Generating report instead...');
-  await generateTemplateReport(inputs, results, kpis, selectedDevice, sections, templateName);
+  await generateTemplateReport(inputs, results, kpis, selectedDevice, sections, templateName, customerInfo, scenario);
 };

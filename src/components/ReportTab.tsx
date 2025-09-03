@@ -100,9 +100,9 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
     };
   }, []);
 
-  // Device-specific scenarios data
+  // Sample scenarios data
   const scenarios: Scenario[] = useMemo(() => {
-    const deviceName = selectedDevice ? `${selectedDevice.manufacturer} ${selectedDevice.model_name}` : 'Selected Device';
+    const deviceName = selectedDevice ? `${selectedDevice.manufacturer} ${selectedDevice.model_name}` : 'No Device Selected';
     
     return [
       {
@@ -263,7 +263,7 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
       scenario: currentScenario,
       dummyContent: {
         practiceName: customerInfo?.businessName || "Aesthetic Laser Center",
-        deviceName: selectedDevice ? `${selectedDevice.manufacturer} ${selectedDevice.model_name}` : "No Device Selected",
+        deviceName: currentScenario?.device || "No Device Selected",
         monthlyRevenue: currentScenario?.keyMetrics.monthlyRevenue || 85000,
         monthlyEBITDA: currentScenario?.keyMetrics.monthlyEBITDA || 48000,
         paybackMonths: currentScenario?.keyMetrics.paybackMonths || 5.2,
@@ -271,11 +271,10 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
         financing: currentScenario?.financing || "30% Down, 5.5% APR, 84 months"
       }
     };
-  }, [selectedTemplate, customSections, selectedScenario, scenarios]);
+  }, [selectedTemplate, customSections, selectedScenario, scenarios, customerInfo]);
 
   return (
-    <>
-      <div className="h-screen flex flex-col">
+    <div className="h-screen flex flex-col">
       {/* Header */}
       <div className="bg-dark-800 border-b border-dark-600 p-4">
         <div className="flex items-center justify-between">
@@ -283,43 +282,24 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
             <h2 className="text-2xl font-bold text-dark-100">Report Generator</h2>
             <p className="text-dark-400 mt-1">Create professional reports to replace PandaDoc</p>
           </div>
-          
           <div className="flex items-center gap-3">
-              {/* Scenario Mega Dropdown */}
+            {/* Scenario Mega Dropdown */}
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setShowScenarioDropdown(!showScenarioDropdown)}
                 className="btn-secondary flex items-center gap-2 min-w-[200px] justify-between"
-                disabled={!selectedDevice}
-                title={!selectedDevice ? "Please select a device from the Calculator tab first" : ""}
               >
-                <span>
-                  {selectedDevice 
-                    ? scenarios.find(s => s.id === selectedScenario)?.name 
-                    : "Select Device First"
-                  }
-                </span>
+                <span>{scenarios.find(s => s.id === selectedScenario)?.name}</span>
                 <ChevronDown className="h-4 w-4" />
               </button>
               
               {showScenarioDropdown && (
                 <div className="absolute top-full left-0 mt-2 w-96 bg-dark-800 border border-dark-600 rounded-lg shadow-lg z-50">
                   <div className="p-3 border-b border-dark-600">
-                    <h3 className="font-semibold text-dark-100">
-                      {selectedDevice ? 'Select Scenario' : 'Device Required'}
-                    </h3>
+                    <h3 className="font-semibold text-dark-100">Select Scenario</h3>
                   </div>
                   <div className="max-h-80 overflow-y-auto">
-                    {!selectedDevice ? (
-                      <div className="p-4 text-center">
-                        <div className="text-yellow-400 mb-2">⚠️</div>
-                        <div className="text-dark-200 mb-2">No device selected</div>
-                        <div className="text-sm text-dark-400">
-                          Please go to the Calculator tab and select a device first to generate scenarios.
-                        </div>
-                      </div>
-                    ) : (
-                      scenarios.map((scenario) => (
+                    {scenarios.map((scenario) => (
                       <button
                         key={scenario.id}
                         onClick={() => {
@@ -354,8 +334,7 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
                           </div>
                         </div>
                       </button>
-                      ))
-                    )}
+                    ))}
                   </div>
                 </div>
               )}
@@ -363,18 +342,16 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
 
             <button
               onClick={handleGenerateReport}
-              disabled={isGenerating || !kpis || !selectedDevice}
+              disabled={isGenerating || !kpis}
               className="btn-primary flex items-center gap-2"
-              title={!selectedDevice ? "Please select a device from the Calculator tab first" : ""}
             >
               <Download className="h-4 w-4" />
               {isGenerating ? 'Generating...' : 'Export PDF'}
             </button>
             <button
               onClick={() => setShowEmailModal(true)}
-              disabled={isGenerating || !kpis || !selectedDevice}
+              disabled={isGenerating || !kpis}
               className="btn-secondary flex items-center gap-2"
-              title={!selectedDevice ? "Please select a device from the Calculator tab first" : ""}
             >
               <Mail className="h-4 w-4" />
               Email Report
@@ -386,7 +363,6 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
             >
               {showSidebar ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
             </button>
-            </div>
           </div>
         </div>
       </div>
@@ -687,8 +663,9 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
               </button>
             </div>
           </div>
+        </div>
       )}
-    </>
+    </div>
   );
 };
 
