@@ -287,7 +287,6 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold text-dark-100">Report Generator</h2>
-            <p className="text-dark-400 mt-1">Create professional reports to replace PandaDoc</p>
           </div>
           <div className="flex items-center gap-3">
             {/* Scenario Mega Dropdown */}
