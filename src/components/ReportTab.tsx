@@ -275,7 +275,7 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
 
   return (
     <div className="h-screen flex flex-col">
-      {/* Header */}
+      {/* Report Controls Bar */}
       <div className="bg-dark-800 border-b border-dark-600 p-4">
         <div className="flex items-center justify-between">
           <div>
