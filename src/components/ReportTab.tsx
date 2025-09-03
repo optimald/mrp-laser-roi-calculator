@@ -379,30 +379,6 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
   );
 };
 
-// Placeholder functions - these will be implemented
-const generateTemplateReport = async (
-  inputs: CalculatorInputs,
-  results: MonthlyResults[],
-  kpis: KPIs | null,
-  selectedDevice: any,
-  sections: string[],
-  templateName: string
-) => {
-  console.log('Generating template report:', { sections, templateName });
-  // Implementation will be added
-};
 
-const emailTemplateReport = async (
-  inputs: CalculatorInputs,
-  results: MonthlyResults[],
-  kpis: KPIs | null,
-  selectedDevice: any,
-  sections: string[],
-  templateName: string,
-  emailData: any
-) => {
-  console.log('Emailing template report:', { sections, templateName, emailData });
-  // Implementation will be added
-};
 
 export default ReportTab;
