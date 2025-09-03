@@ -687,9 +687,7 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
               </button>
             </div>
           </div>
-        </div>
       )}
-      </div>
     </>
   );
 };
