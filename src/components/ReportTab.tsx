@@ -762,7 +762,7 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
                             />
                             <div>
                               <div className="text-dark-100 font-semibold">Powered by MRP</div>
-                              <div className="text-dark-400 text-xs">Medical Revenue Partners</div>
+                              <div className="text-dark-400 text-xs">Healthcare Markets</div>
                             </div>
                           </div>
                           <a 

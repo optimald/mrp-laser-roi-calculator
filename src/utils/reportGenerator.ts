@@ -509,7 +509,7 @@ export const reportSections: Record<string, ReportSection> = {
       pdf.setFontSize(12);
       pdf.text('Powered by MRP', 45, yPosition + 10);
       pdf.setFontSize(10);
-      pdf.text('Medical Revenue Partners', 45, yPosition + 16);
+      pdf.text('Healthcare Markets', 45, yPosition + 16);
       
       // Add website link
       pdf.setTextColor(59, 130, 246);
