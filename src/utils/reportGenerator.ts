@@ -250,6 +250,48 @@ export const reportSections: Record<string, ReportSection> = {
       
       return yPosition + 10;
     }
+  },
+  
+  'disclaimer': {
+    id: 'disclaimer',
+    name: 'Legal Disclaimer',
+    content: (pdf, inputs, results, kpis, selectedDevice, yPosition) => {
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      
+      yPosition = addSectionHeader(pdf, 'Legal Disclaimer', yPosition, pageWidth);
+      
+      // Set text color to red for disclaimer
+      pdf.setTextColor(220, 38, 38);
+      
+      const disclaimerText = [
+        'IMPORTANT LEGAL NOTICE:',
+        '',
+        'This financial analysis and ROI projection report contains forward-looking statements and projections based on current market data and industry benchmarks. The information provided is for informational purposes only and should not be construed as financial, investment, or business advice.',
+        '',
+        'Key Disclaimers:',
+        '• All financial projections are estimates based on current market conditions and may not reflect actual results',
+        '• Past performance does not guarantee future results',
+        '• Market conditions, competitive factors, and operational efficiency may significantly impact actual outcomes',
+        '• This analysis should be reviewed by qualified financial professionals before making investment decisions',
+        '• MRP.io and its affiliates make no warranties or guarantees regarding the accuracy of these projections',
+        '• Users should conduct their own due diligence and seek professional advice before making business decisions',
+        '',
+        'By using this report, you acknowledge that you have read, understood, and agree to these terms and conditions.'
+      ];
+      
+      disclaimerText.forEach(line => {
+        if (line === '') {
+          yPosition += 5;
+        } else {
+          yPosition = addText(pdf, line, 20, yPosition, pageWidth - 40, 9);
+        }
+      });
+      
+      // Reset text color
+      pdf.setTextColor(0, 0, 0);
+      
+      return yPosition + 10;
+    }
   }
 };
 

@@ -42,32 +42,32 @@ const defaultTemplates: ReportTemplate[] = [
     id: 'executive-summary',
     name: 'Executive Summary',
     description: 'High-level overview for decision makers',
-    sections: ['header', 'executive-summary', 'key-metrics', 'device-info', 'financing'],
+    sections: ['header', 'executive-summary', 'key-metrics', 'device-info', 'financing', 'disclaimer'],
     isDefault: true
   },
   {
     id: 'detailed-analysis',
     name: 'Detailed Analysis',
     description: 'Comprehensive report with full financial breakdown',
-    sections: ['header', 'executive-summary', 'device-info', 'financing', 'monthly-breakdown', 'charts', 'assumptions']
+    sections: ['header', 'executive-summary', 'device-info', 'financing', 'monthly-breakdown', 'assumptions', 'disclaimer']
   },
   {
     id: 'investor-pitch',
     name: 'Investor Pitch',
     description: 'Professional presentation for funding requests',
-    sections: ['header', 'executive-summary', 'market-opportunity', 'financial-projections', 'risk-analysis']
+    sections: ['header', 'executive-summary', 'key-metrics', 'device-info', 'financing', 'disclaimer']
   },
   {
     id: 'custom',
     name: 'Custom Report',
     description: 'Build your own report with selected sections',
-    sections: ['header']
+    sections: ['header', 'disclaimer']
   }
 ];
 
 const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDevice }) => {
   const [selectedTemplate, setSelectedTemplate] = useState<ReportTemplate>(defaultTemplates[0]);
-  const [customSections, setCustomSections] = useState<string[]>(['header']);
+  const [customSections, setCustomSections] = useState<string[]>(['header', 'disclaimer']);
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedScenario, setSelectedScenario] = useState<string>('scenario-a');
   const [emailData, setEmailData] = useState({
@@ -138,13 +138,14 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
     { id: 'assumptions', name: 'Assumptions & Methodology', icon: <FileTextIcon className="h-4 w-4" /> },
     { id: 'market-opportunity', name: 'Market Opportunity', icon: <Globe className="h-4 w-4" /> },
     { id: 'financial-projections', name: 'Financial Projections', icon: <BarChart3 className="h-4 w-4" /> },
-    { id: 'risk-analysis', name: 'Risk Analysis', icon: <AlertTriangle className="h-4 w-4" /> }
+    { id: 'risk-analysis', name: 'Risk Analysis', icon: <AlertTriangle className="h-4 w-4" /> },
+    { id: 'disclaimer', name: 'Legal Disclaimer', icon: <AlertTriangle className="h-4 w-4" /> }
   ];
 
   const handleTemplateSelect = (template: ReportTemplate) => {
     setSelectedTemplate(template);
     if (template.id === 'custom') {
-      setCustomSections(['header']);
+      setCustomSections(['header', 'disclaimer']);
     }
   };
 
@@ -215,15 +216,26 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
     }).filter(Boolean);
 
     const estimatedPages = Math.ceil(sections.length / 2) + 1; // Rough estimate
-    const hasData = kpis && results.length > 0;
+    const hasData = true; // Always show data for demo
+    const currentScenario = scenarios.find(s => s.id === selectedScenario);
     
     return {
       sections: sectionDetails,
       estimatedPages,
       hasData,
-      totalSections: sections.length
+      totalSections: sections.length,
+      scenario: currentScenario,
+      dummyContent: {
+        practiceName: "Aesthetic Laser Center",
+        deviceName: currentScenario?.device || "Cutera XEO 2018",
+        monthlyRevenue: currentScenario?.keyMetrics.monthlyRevenue || 85000,
+        monthlyEBITDA: currentScenario?.keyMetrics.monthlyEBITDA || 48000,
+        paybackMonths: currentScenario?.keyMetrics.paybackMonths || 5.2,
+        npv: currentScenario?.keyMetrics.npv || 1250000,
+        financing: currentScenario?.financing || "30% Down, 5.5% APR, 84 months"
+      }
     };
-  }, [selectedTemplate, customSections, kpis, results]);
+  }, [selectedTemplate, customSections, selectedScenario, scenarios]);
 
   return (
     <div className="p-6 space-y-6">
@@ -423,22 +435,7 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
         </div>
       </div>
 
-      {/* Report Disclaimer */}
-      <div className="bg-yellow-900/20 border border-yellow-600/30 rounded-lg p-4">
-        <h3 className="text-lg font-semibold text-yellow-200 mb-3 flex items-center gap-2">
-          <AlertTriangle className="h-5 w-5" />
-          Report Disclaimer
-        </h3>
-        <div className="text-sm text-yellow-100 leading-relaxed">
-          {reportDisclaimers[selectedTemplate.id] || reportDisclaimers['custom']}
-        </div>
-        <div className="mt-3 pt-3 border-t border-yellow-600/30">
-          <div className="text-xs text-yellow-200">
-            <strong>Selected Scenario:</strong> {scenarios.find(s => s.id === selectedScenario)?.name} - 
-            {scenarios.find(s => s.id === selectedScenario)?.description}
-          </div>
-        </div>
-      </div>
+
 
       {/* Preview */}
       <div className="bg-dark-800 rounded-lg p-4">
@@ -499,6 +496,40 @@ const ReportTab: React.FC<ReportTabProps> = ({ inputs, results, kpis, selectedDe
                     <span className="text-dark-200">{section.name}</span>
                   </div>
                 ))}
+                {/* Always include disclaimer as a report section */}
+                <div className="flex items-center gap-2 text-sm">
+                  <div className="text-yellow-400"><AlertTriangle className="h-4 w-4" /></div>
+                  <span className="text-dark-200">Legal Disclaimer</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Dummy Report Content Preview */}
+            <div className="pt-4 border-t border-dark-600">
+              <div className="text-sm text-dark-400 mb-3">Sample Content Preview:</div>
+              <div className="bg-dark-700 rounded-md p-3 text-xs space-y-2">
+                <div className="text-dark-200">
+                  <strong>Practice:</strong> {previewData.dummyContent.practiceName}
+                </div>
+                <div className="text-dark-200">
+                  <strong>Device:</strong> {previewData.dummyContent.deviceName}
+                </div>
+                <div className="text-dark-200">
+                  <strong>Financing:</strong> {previewData.dummyContent.financing}
+                </div>
+                <div className="grid grid-cols-2 gap-4 mt-3">
+                  <div>
+                    <div className="text-green-400">Monthly Revenue: ${(previewData.dummyContent.monthlyRevenue / 1000).toFixed(0)}k</div>
+                    <div className="text-green-400">Monthly EBITDA: ${(previewData.dummyContent.monthlyEBITDA / 1000).toFixed(0)}k</div>
+                  </div>
+                  <div>
+                    <div className="text-blue-400">Payback Period: {previewData.dummyContent.paybackMonths} months</div>
+                    <div className="text-purple-400">NPV: ${(previewData.dummyContent.npv / 1000000).toFixed(1)}M</div>
+                  </div>
+                </div>
+                <div className="pt-2 border-t border-dark-600 text-yellow-200">
+                  <strong>Disclaimer:</strong> {reportDisclaimers[selectedTemplate.id] || reportDisclaimers['custom']}
+                </div>
               </div>
             </div>
             
