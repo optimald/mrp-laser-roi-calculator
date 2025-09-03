@@ -80,7 +80,7 @@ export const reportSections: Record<string, ReportSection> = {
   'header': {
     id: 'header',
     name: 'Header & Practice Info',
-    content: (pdf, inputs, results, kpis, selectedDevice, yPosition) => {
+    content: (pdf, _inputs, _results, _kpis, _selectedDevice, yPosition) => {
       const pageWidth = pdf.internal.pageSize.getWidth();
       
       // Header
@@ -102,7 +102,7 @@ export const reportSections: Record<string, ReportSection> = {
   'executive-summary': {
     id: 'executive-summary',
     name: 'Executive Summary',
-    content: (pdf, inputs, results, kpis, selectedDevice, yPosition) => {
+    content: (pdf, _inputs, _results, kpis, _selectedDevice, yPosition) => {
       const pageWidth = pdf.internal.pageSize.getWidth();
       
       yPosition = addSectionHeader(pdf, 'Executive Summary', yPosition, pageWidth);
@@ -128,18 +128,23 @@ export const reportSections: Record<string, ReportSection> = {
   'key-metrics': {
     id: 'key-metrics',
     name: 'Key Performance Metrics',
-    content: (pdf, inputs, results, kpis, selectedDevice, yPosition) => {
+    content: (pdf, inputs, _results, kpis, _selectedDevice, yPosition) => {
       const pageWidth = pdf.internal.pageSize.getWidth();
       
       yPosition = addSectionHeader(pdf, 'Key Performance Metrics', yPosition, pageWidth);
       
       if (kpis) {
+        const totalCost = inputs.device.msrp - inputs.device.discount + inputs.device.accessories + inputs.device.shippingInstall;
+        const monthlyCashFlow = kpis.monthlyEBITDA - kpis.monthlyPayment;
+        const monthlyTreatments = (kpis.monthlyRevenue / inputs.pricing.listPricePerTreatment);
+        const revenuePerTreatment = inputs.pricing.listPricePerTreatment;
+        
         const metricsData = [
           ['Metric', 'Value', 'Target'],
-          ['ROI', `${(kpis.npv / (inputs.device.msrp - inputs.device.discount + inputs.device.accessories + inputs.device.shippingInstall) * 100).toFixed(1)}%`, '>15%'],
-          ['Monthly Cash Flow', `$${kpis.monthlyCashFlow.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`, 'Positive'],
-          ['Treatment Volume', `${kpis.monthlyTreatments.toFixed(0)}`, '>200'],
-          ['Revenue per Treatment', `$${kpis.revenuePerTreatment.toFixed(0)}`, '>$400']
+          ['ROI', `${(kpis.npv / totalCost * 100).toFixed(1)}%`, '>15%'],
+          ['Monthly Cash Flow', `$${monthlyCashFlow.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`, 'Positive'],
+          ['Treatment Volume', `${monthlyTreatments.toFixed(0)}`, '>200'],
+          ['Revenue per Treatment', `$${revenuePerTreatment.toFixed(0)}`, '>$400']
         ];
         
         yPosition = addTable(pdf, metricsData[0], metricsData.slice(1), yPosition, pageWidth);
@@ -152,7 +157,7 @@ export const reportSections: Record<string, ReportSection> = {
   'device-info': {
     id: 'device-info',
     name: 'Device Information',
-    content: (pdf, inputs, results, kpis, selectedDevice, yPosition) => {
+    content: (pdf, inputs, _results, _kpis, selectedDevice, yPosition) => {
       const pageWidth = pdf.internal.pageSize.getWidth();
       
       yPosition = addSectionHeader(pdf, 'Device Information', yPosition, pageWidth);
@@ -183,7 +188,7 @@ export const reportSections: Record<string, ReportSection> = {
   'financing': {
     id: 'financing',
     name: 'Financing Details',
-    content: (pdf, inputs, results, kpis, selectedDevice, yPosition) => {
+    content: (pdf, inputs, _results, _kpis, _selectedDevice, yPosition) => {
       const pageWidth = pdf.internal.pageSize.getWidth();
       
       yPosition = addSectionHeader(pdf, 'Financing Details', yPosition, pageWidth);
@@ -205,7 +210,7 @@ export const reportSections: Record<string, ReportSection> = {
   'monthly-breakdown': {
     id: 'monthly-breakdown',
     name: 'Monthly P&L Breakdown',
-    content: (pdf, inputs, results, kpis, selectedDevice, yPosition) => {
+    content: (pdf, _inputs, results, _kpis, _selectedDevice, yPosition) => {
       const pageWidth = pdf.internal.pageSize.getWidth();
       
       yPosition = addSectionHeader(pdf, 'Monthly P&L Summary (First 12 Months)', yPosition, pageWidth);
@@ -229,7 +234,7 @@ export const reportSections: Record<string, ReportSection> = {
   'assumptions': {
     id: 'assumptions',
     name: 'Assumptions & Methodology',
-    content: (pdf, inputs, results, kpis, selectedDevice, yPosition) => {
+    content: (pdf, _inputs, _results, _kpis, _selectedDevice, yPosition) => {
       const pageWidth = pdf.internal.pageSize.getWidth();
       
       yPosition = addSectionHeader(pdf, 'Key Assumptions', yPosition, pageWidth);
@@ -255,7 +260,7 @@ export const reportSections: Record<string, ReportSection> = {
   'disclaimer': {
     id: 'disclaimer',
     name: 'Legal Disclaimer',
-    content: (pdf, inputs, results, kpis, selectedDevice, yPosition) => {
+    content: (pdf, _inputs, _results, _kpis, _selectedDevice, yPosition) => {
       const pageWidth = pdf.internal.pageSize.getWidth();
       
       yPosition = addSectionHeader(pdf, 'Legal Disclaimer', yPosition, pageWidth);
@@ -305,7 +310,6 @@ export const generateTemplateReport = async (
   templateName: string
 ) => {
   const pdf = new jsPDF('p', 'mm', 'a4');
-  const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
   let yPosition = 20;
   
@@ -336,7 +340,7 @@ export const emailTemplateReport = async (
   selectedDevice: any,
   sections: string[],
   templateName: string,
-  emailData: any
+  _emailData: any
 ) => {
   // For now, just generate and download the report
   // In a real implementation, this would integrate with an email service

@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { FileText, Download, Mail, Settings, Eye, Plus, Trash2, ClipboardList, BarChart3, Target, Microscope, DollarSign, TrendingUp, FileText as FileTextIcon, Globe, AlertTriangle, ChevronDown, X, Check } from 'lucide-react';
+import { FileText, Download, Mail, Settings, Eye, ClipboardList, BarChart3, Target, Microscope, DollarSign, TrendingUp, FileText as FileTextIcon, Globe, AlertTriangle, ChevronDown, X, Check } from 'lucide-react';
 import type { CalculatorInputs, MonthlyResults, KPIs } from '../utils/calculations';
-import { generateTemplateReport, emailTemplateReport, reportSections } from '../utils/reportGenerator';
+import { generateTemplateReport, emailTemplateReport } from '../utils/reportGenerator';
 
 interface ReportTabProps {
   inputs: CalculatorInputs;
